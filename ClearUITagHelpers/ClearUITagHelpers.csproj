@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <PackageId>ClearUI-TagHelers</PackageId>
+	  <Version>1.0.1</Version>
+	  <Authors>Phil Bird</Authors>
+	  <Company>Clear Way Solution</Company>
+	  <Description>Razor Tag Helpers for use with ClearUI Vue Components</Description>
+	  <Title>ClearUI Tag Helpers</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.12" />
+  </ItemGroup>
+
+</Project>

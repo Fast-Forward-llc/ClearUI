@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11801.241 oobstable
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClearUI", "ClearUI\ClearUI.csproj", "{E672492F-E813-621F-294E-5D1204729655}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClearUITagHelpers", "ClearUITagHelpers\ClearUITagHelpers.csproj", "{25CD74F7-1227-DB2C-89A8-37737BD0DA75}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E672492F-E813-621F-294E-5D1204729655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E672492F-E813-621F-294E-5D1204729655}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E672492F-E813-621F-294E-5D1204729655}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E672492F-E813-621F-294E-5D1204729655}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25CD74F7-1227-DB2C-89A8-37737BD0DA75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25CD74F7-1227-DB2C-89A8-37737BD0DA75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25CD74F7-1227-DB2C-89A8-37737BD0DA75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25CD74F7-1227-DB2C-89A8-37737BD0DA75}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {64D8948D-2D22-4630-9F8E-D764B6F15988}
+	EndGlobalSection
+EndGlobal
