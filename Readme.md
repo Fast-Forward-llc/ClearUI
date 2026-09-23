@@ -6,7 +6,6 @@ ClearUI is a collection of reusable, accessible Vue.js UI components paired with
 
 - **[ClearUI](./ClearUI/VueComponents/Readme.md)** — The Vue.js component library: accessible, form-friendly UI components (textboxes, dropdowns, checkboxes, grids, dialogs, virtual scrolling, and more) along with supporting JS utilities.
 - **[ClearUITagHelpers](./ClearUITagHelpers/Readme.md)** — ASP.NET Core Razor Pages tag helpers that bridge server-side model binding (`asp-for`) to the ClearUI Vue components, removing the boilerplate of wiring up `id`, `name`, `v-model`, and `label` bindings by hand.
-- **ClearUIDemoApp** — A Razor Pages demo application showcasing the ClearUI components and tag helpers working together.
 
 ## Getting Started
 
