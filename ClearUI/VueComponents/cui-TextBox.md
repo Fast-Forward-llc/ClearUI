@@ -19,17 +19,17 @@ A flexible textbox component supporting various input types, validation, accessi
 
 | Name                | Type      | Default   | Description                                                                 |
 |---------------------|-----------|-----------|-----------------------------------------------------------------------------|
-| id                  | String    | —         | Input element ID. Auto-generated if not provided.                           |
-| label               | String    | —         | Label displayed above the textbox.                                          |
-| modelValue          | Any       | —         | Value for v-model binding.                                                  |
-| value               | Any       | —         | Initial value (alternative to v-model).                                     |
-| type                | String    | —         | Input type (`text`, `number`, `date`, etc.).                                |
+| id                  | String    | â€”         | Input element ID. Auto-generated if not provided.                           |
+| label               | String    | â€”         | Label displayed above the textbox.                                          |
+| modelValue          | Any       | â€”         | Value for v-model binding.                                                  |
+| value               | Any       | â€”         | Initial value (alternative to v-model).                                     |
+| type                | String    | â€”         | Input type (`text`, `number`, `date`, etc.).                                |
 | required            | Boolean   | false     | Whether the field is required.                                              |
 | disabled            | Boolean   | false     | Disables the input.                                                         |
 | readonly            | Boolean   | false     | Makes the input read-only.                                                  |
-| placeholder         | String    | —         | Placeholder text.                                                           |
-| errorMsg            | String    | —         | Error message to display.                                                   |
-| modelModifiers      | Object    | —         | Vue v-model modifiers (e.g., `lazy`, `trim`, `number`).                     |
+| placeholder         | String    | â€”         | Placeholder text.                                                           |
+| errorMsg            | String    | â€”         | Error message to display.                                                   |
+| modelModifiers      | Object    | â€”         | Vue v-model modifiers (e.g., `lazy`, `trim`, `number`).                     |
 | formatter           | Function  | null      | Custom value formatter.                                                     |
 | keyFilter           | Function  | null      | Custom key filter for input.                                                |
 | errorEventSelector  | String    | null      | CSS selector for dispatching error events to other elements.                |

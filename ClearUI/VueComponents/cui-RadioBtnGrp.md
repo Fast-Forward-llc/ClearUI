@@ -26,14 +26,14 @@ A custom, accessible radio button group component for Vue.js. Renders a group of
 |----------------|--------------------------|-----------|--------------------------------------------------------------------|
 | id             | String                   | auto      | Unique ID for the component.                                       |
 | name           | String                   | auto      | Name for the hidden input (grouping).                              |
-| label          | String                   | —         | Label for the radio group.                                         |
-| listItems      | Array                    | —         | Array of radio button options.                                     |
+| label          | String                   | â€”         | Label for the radio group.                                         |
+| listItems      | Array                    | â€”         | Array of radio button options.                                     |
 | valueField     | String                   | null      | Field name for the value in each item.                             |
 | textField      | String                   | null      | Field name for the display text in each item.                      |
 | allowUnselect  | Boolean                  | false     | Allows unselecting a selected radio (sets to uncheckedValue). <br/>A second click/select action on a selected radio unselects it. |
 | modelValue     | Any                      | false     | The current value binding (v-model).                                       |
 | uncheckedValue | Boolean/Number/String    | null      | Value when unselected (if allowUnselect is true).                  |
-| errorMsg       | String                   | —         | Error message to display.                                                   |
+| errorMsg       | String                   | â€”         | Error message to display.                                                   |
 | disabled       | Boolean                  | false     | Disables the radio group.                                          |
 | readonly       | Boolean                  | false     | Makes the radio group read-only.                                   |
 | required       | Boolean                  | false     | Marks the radio group as required.                                 |

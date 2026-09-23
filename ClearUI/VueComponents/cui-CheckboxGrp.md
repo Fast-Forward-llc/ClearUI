@@ -25,8 +25,8 @@ A custom, accessible checkbox group component for Vue.js. Renders a group of che
 |----------------|--------------------------|-----------|--------------------------------------------------------------------|
 | id             | String                   | auto      | Unique ID for the component.                                       |
 | name           | String                   | auto      | Name for the hidden inputs (grouping).                             |
-| label          | String                   | —         | Label for the checkbox group.                                      |
-| listItems      | Array                    | —         | Array of checkbox options.                                         |
+| label          | String                   | â€”         | Label for the checkbox group.                                      |
+| listItems      | Array                    | â€”         | Array of checkbox options.                                         |
 | valueField     | String                   | null      | Field name for the value in each item.                             |
 | textField      | String                   | null      | Field name for the display text in each item.                      |
 | modelValue     | Array                    | []        | The current values (v-model, array of checked values).             |

@@ -40,8 +40,4 @@
 		<VueComponents Include="VueComponents\*.vue" />
 		<JsFiles Include="js\*.js" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="ClearUIDemoApp\Pages\" />
-	</ItemGroup>
 </Project>

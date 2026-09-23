@@ -20,7 +20,7 @@ A custom, accessible checkbox component using a div and Material Symbols for the
 |----------------|--------------------------|-----------|--------------------------------------------------------------------|
 | id             | String                   | auto      | Unique ID for the component.                                       |
 | name           | String                   | auto      | Name for the hidden input.                                         |
-| label          | String                   | —         | Label for the checkbox.                                            |
+| label          | String                   | â€”         | Label for the checkbox.                                            |
 | modelValue     | Any                      | false     | The current value (v-model). Becomes an array for multi-checkboxes.|
 | value          | Boolean/Number/String    | true      | Value when checked.                                                |
 | uncheckedValue | Boolean/Number/String    | false     | Value when unchecked.                                              |

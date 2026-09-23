@@ -22,12 +22,12 @@
 
 | Slot Name      | Scope/Props Provided                | Description                                                                 |
 |----------------|------------------------------------|-----------------------------------------------------------------------------|
-| caption      | —                                  | Custom table caption.                                                       |
+| caption      | â€”                                  | Custom table caption.                                                       |
 | thead        | `{ items, columns }`               | Custom table header row(s).                                                 |
 | tfoot        | `{ items, columns }`               | Custom table footer row(s).                                                 |
 | tbody        | `{ items, columns }`               | Custom table body rows.                                                     |
-| tbody-empty  | —                                  | Custom content when `gridItems` is empty.                                   |
-| errors       | —                                  | Custom error display area below the table.                                  |
+| tbody-empty  | â€”                                  | Custom content when `gridItems` is empty.                                   |
+| errors       | â€”                                  | Custom error display area below the table.                                  |
 | components   | `{ items, columns, filterBy, SortBy }`| Grid helper components go here e.g. filtering, Sorting, Pagination, etc.    |
 
 ---

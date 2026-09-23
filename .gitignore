@@ -132,3 +132,5 @@ ClearUIDemoApp/wwwroot/js/clear-ui.es.js
 ClearUIDemoApp/wwwroot/css/clearui.css
 /ClearUITagHelpers/nuget.config
 /ClearUI/dist
+/ClearUIDocs
+ClearUIDocs.sln

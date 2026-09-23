@@ -21,16 +21,16 @@ A component for making HTTP requests and binding the response to a variable.
 
 | Name         | Type                | Default   | Description                                      |
 |--------------|---------------------|-----------|--------------------------------------------------|
-| modelValue   | Any                 | —         | Value for v-model binding (response data).        |
-| url          | String (required)   | —         | The endpoint URL for the HTTP request.            |
+| modelValue   | Any                 | â€”         | Value for v-model binding (response data).        |
+| url          | String (required)   | â€”         | The endpoint URL for the HTTP request.            |
 | qparams      | Object              | `{}`      | Query/body parameters.                            |
 | verb         | String              | `'GET'`   | HTTP method (`GET`, `POST`, etc.).                |
 | credentials  | String              | `'same-origin'`| Credential handling (`same-origin`, `include`, `omit`). <br>Subject to CORS configuration and Cookie policies.               |
 | headers      | Object              | `{}`      | HTTP headers.                                     |
 | body         | String/Object       | `null`    | Request body (for POST/PUT).                      |
 | disabled     | Boolean             | `false`   | Disables the request.                             |
-| triggerOnAny	| Any                | —         | Any Change (truthy or not) to the trigger value will trigger a new request.|
-| triggerOn		| Any				 | —	     | Triggers request when value is changed to a new truthy value. <br>Changing the trigger value from one truthy value i.e. 1 to another truthy value i.e. 2 will trigger the request. assigning the same value again will not. assigning a falsy value will not trigger the request.|
+| triggerOnAny	| Any                | â€”         | Any Change (truthy or not) to the trigger value will trigger a new request.|
+| triggerOn		| Any				 | â€”	     | Triggers request when value is changed to a new truthy value. <br>Changing the trigger value from one truthy value i.e. 1 to another truthy value i.e. 2 will trigger the request. assigning the same value again will not. assigning a falsy value will not trigger the request.|
 
 ## Events
 
@@ -40,8 +40,8 @@ A component for making HTTP requests and binding the response to a variable.
 | update:is-active     | Boolean         | Emitted when request activity changes.      |
 | received             | value           | Emitted when the response is received. <br>Response body passed as first parameter.      |
 | error                | error           | Emitted when the request fails.  <br>Error object passed as first parameter.            |
-| begin-request        | —               | Emitted when a request starts.              |
-| end-request          | —               | Emitted when a request ends.                |
+| begin-request        | â€”               | Emitted when a request starts.              |
+| end-request          | â€”               | Emitted when a request ends.                |
 
 ## Authorization
 The component checks for an authorization header stored in browser sessionStorage under the key `api-auth-token|{origin}` where `{origin}` is the origin of the url.

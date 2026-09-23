@@ -25,11 +25,11 @@ A custom, accessible radio button component using a div and Material Symbols for
 |----------------|--------------------------|-----------|--------------------------------------------------------------------|
 | id             | String                   | auto      | Unique ID for the component.                                       |
 | name           | String                   | auto      | Name for the hidden input (grouping).                              |
-| label          | String                   | —         | Label for the radio button.                                        |
+| label          | String                   | â€”         | Label for the radio button.                                        |
 | modelValue     | Any                      | false     | The current value (v-model).                                       |
 | value          | Boolean/Number/String    | true      | Value for this radio button.                                       |
 | uncheckedValue | Boolean/Number/String    | false     | Value when unchecked (rarely used for radios).                     |
-| errorMsg       | String                   | —         | Error message to display.                                                   |
+| errorMsg       | String                   | â€”         | Error message to display.                                                   |
 | disabled       | Boolean                  | false     | Disables the radio button.                                         |
 | readonly       | Boolean                  | false     | Makes the radio button read-only.                                  |
 | required       | Boolean                  | false     | Marks the radio button as required.                                |

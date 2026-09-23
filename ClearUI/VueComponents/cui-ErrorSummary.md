@@ -16,9 +16,9 @@ A component for displaying a summary of validation errors, with accessible navig
 
 | Name         | Type      | Default | Description                                                      |
 |--------------|-----------|---------|------------------------------------------------------------------|
-| heading      | String    | —       | Optional heading text to display above the error list.           |
+| heading      | String    | â€”       | Optional heading text to display above the error list.           |
 | headingLevel | String    | `h2`    | HTML heading level for the heading (e.g., 'h2', 'h3').           |
-| errors       | ErrorList | —       | The ErrorList instance containing validation errors.              |
+| errors       | ErrorList | â€”       | The ErrorList instance containing validation errors.              |
 
 ## Events
 

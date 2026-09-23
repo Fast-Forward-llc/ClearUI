@@ -17,14 +17,14 @@ A Vue component for producing validation messages based on a critieria, with sup
 
 | Name      | Type     | Default   | Description                                                        |
 |-----------|----------|-----------|--------------------------------------------------------------------|
-| id        | String   | —         | Message element ID. Auto-generated if not set.                     |
-| msgId     | String   | —         | Message ID. Defaults to `id`.                                      |
-| ctrlId    | String   | —         | ID of the control this message is for.                             |
-| expr      | Boolean  | —         | If `true`, message is hidden and error is cleared. If `false`, message is shown and error is set. |
-| msg       | String   | —         | The validation message to display.                                 |
+| id        | String   | â€”         | Message element ID. Auto-generated if not set.                     |
+| msgId     | String   | â€”         | Message ID. Defaults to `id`.                                      |
+| ctrlId    | String   | â€”         | ID of the control this message is for.                             |
+| expr      | Boolean  | â€”         | If `true`, message is hidden and error is cleared. If `false`, message is shown and error is set. |
+| msg       | String   | â€”         | The validation message to display.                                 |
 | inline    | Boolean  | `true`    | Show message inline (`true`) or dispatch error event (`false`).     |
 | priority  | Number   | `1`       | Priority for error sorting.                                        |
-| triggerOn | Any      | —         | Change to trigger validation. assigning any new truthy value will trigger validation. assigning the same value or a falsy value will not trigger validation.|
+| triggerOn | Any      | â€”         | Change to trigger validation. assigning any new truthy value will trigger validation. assigning the same value or a falsy value will not trigger validation.|
 | disabled  | Boolean  | `false`   | Disables the message.                                              |
 | clearOnDisabled  | Boolean  | `true`   | Clears the Error message when `disabled` becomes `true`.     |
 | clearOn   | Any      | -         | Clears the Error message when the value changes and is truthy      |

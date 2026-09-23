@@ -25,22 +25,22 @@ A flexible, accessible tree list component for displaying and selecting hierarch
 |------------------|-----------|-----------|--------------------------------------------------------------------|
 | id               | String    | auto      | Unique ID for the component.                                       |
 | name             | String    | auto      | Name for the hidden input.                                         |
-| listItems        | Array     | —         | Array of tree node objects.                                        |
-| label            | String    | —         | Label for the tree list.                                           |
-| valueField       | String    | —         | Field name for node value.                                         |
-| textField        | String    | —         | Field name for node display text.                                  |
-| typeField        | String    | —         | Field name for node type (for custom rendering).                   |
-| selectableField  | String    | —         | Field name for per-node selectability (boolean).                   |
-| childNodesField  | String    | —         | Field name for child nodes array.                                  |
-| modelValue       | Array     | —         | Selected values (v-model).                                         |
+| listItems        | Array     | â€”         | Array of tree node objects.                                        |
+| label            | String    | â€”         | Label for the tree list.                                           |
+| valueField       | String    | â€”         | Field name for node value.                                         |
+| textField        | String    | â€”         | Field name for node display text.                                  |
+| typeField        | String    | â€”         | Field name for node type (for custom rendering).                   |
+| selectableField  | String    | â€”         | Field name for per-node selectability (boolean).                   |
+| childNodesField  | String    | â€”         | Field name for child nodes array.                                  |
+| modelValue       | Array     | â€”         | Selected values (v-model).                                         |
 | invalid          | Boolean   | false     | Marks the control as invalid.                                      |
 | required         | Boolean   | false     | Marks the control as required.                                     |
 | disabled         | Boolean   | false     | Disables the control.                                              |
 | readonly         | Boolean   | false     | Makes the control read-only.                                       |
 | selectable       | Boolean   | false     | Enables selection of nodes.                                        |
 | cascadeSelect    | Boolean   | true      | Enables cascading selection to children/parents.                   |
-| modelModifiers   | Object    | —         | Vue v-model modifiers (e.g., lazy, trim, number).                  |
-| errorMsg        | String    | —         | Error message to display.                                          |
+| modelModifiers   | Object    | â€”         | Vue v-model modifiers (e.g., lazy, trim, number).                  |
+| errorMsg        | String    | â€”         | Error message to display.                                          |
 | collapsible      | Boolean   | true      | Allows nodes to be collapsed/expanded.                             |
 | selectItemFn     | Function  | null      | Custom function for item selection.                                |
 | bubblesErrors     | Boolean  | true      | Controls if validation errors bubble to parent elements.           |
