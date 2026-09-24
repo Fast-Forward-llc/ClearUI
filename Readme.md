@@ -13,6 +13,9 @@ See the individual project readmes for setup and usage details:
 - [ClearUI Vue Components](./ClearUI/VueComponents/Readme.md)
 - [ClearUI Tag Helpers](./ClearUITagHelpers/Readme.md)
 
+## Live examples and documentation
+- [ClearUI Live Examples](http://clearui.fast-forward-it.com/) - A live demo of the ClearUI components and tag helpers in action, along with documentation and usage examples.
+
 ## License
 
 Licensed under the MIT License. See the license header in individual source files for details.
