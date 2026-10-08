@@ -33,6 +33,7 @@ A flexible dropdown/select component supporting grouped options, custom value/te
 | required         | Boolean   | false     | Whether the field is required.                                               |
 | disabled         | Boolean   | false     | Disables the dropdown.                                                       |
 | readonly         | Boolean   | false     | Makes the dropdown read-only.                                                |
+| multiselect      | Boolean   | false     | Enables selecting multiple options. See [Multiselect](#multiselect) below.   |
 | errorMsg         | String    | —         | Error message to display.                                                    |
 | bubbleErrors     | Boolean   | true      | Controls if validation errors bubble to parent elements.                     |
 
@@ -83,6 +84,30 @@ A flexible dropdown/select component supporting grouped options, custom value/te
     </template>
   </cui-dropdown>
   ```
+
+## Multiselect
+
+When `multiselect` is `true`, `modelValue` is expected to be an array of values instead of a single value. Clicking an option toggles its presence in the array rather than replacing the value and closing the dropdown, so users can select or deselect several options without the dropdown closing between selections.
+
+```vue
+<cui-dropdown
+  v-model="values"
+  label="Colors"
+  :list-items="colors"
+  value-field="id"
+  text-field="name"
+  :multiselect="true"
+/>
+```
+
+### Toggling `multiselect` at runtime
+
+If `multiselect` changes after the component has a value, `modelValue` is automatically converted to keep it consistent with the new mode:
+
+- **Single value → array** (`multiselect` becomes `true`): a non-null value is wrapped in a one-item array (`value` becomes `[value]`). A `null`/`undefined` value stays `null`.
+- **Array → single value** (`multiselect` becomes `false`): an empty array becomes `null`. A non-empty array keeps only its first element and discards the rest.
+
+This conversion updates `modelValue` via the normal `update:model-value` emit, so a parent bound with `v-model` will see the converted value reflected back automatically.
 
 ## Accessibility
 
