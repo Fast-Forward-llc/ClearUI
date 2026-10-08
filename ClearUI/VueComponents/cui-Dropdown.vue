@@ -13,6 +13,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             </div>
             <dialog ref="list" class="dropdown-list" role="listbox" tabindex="-1" v-on:focusout="onFocusOut" v-on:keydown.stop="onKeydown_list" 
                     :style="{'position-anchor':'--'+Id, 'container-name':Id}">
+                <slot name="option-list" :items="internalList" :selectedValue="selectedValue" :listItemValue="listItemValue" :listItemText="listItemText" :isSelected="isSelected" :selectOption="selectOption" :isGroupItem="isGroupItem" >
                     <div v-for="option in internalList"
                          :key="listItemValue(option)"
                          :role="isGroupItem(option)?'presentation':'option'"
@@ -35,6 +36,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                         </div>
                         <div v-if="!internalList||internalList.length==0">No List Items</div>
                     </div>
+                </slot>
             </dialog>
         </div>
         <div class="errors" role="status" :id="this.Id+'_valmsg'">

@@ -53,6 +53,36 @@ A flexible dropdown/select component supporting grouped options, custom value/te
 
 - **default**: Custom content below the dropdown. Only rendered if provided by parent.
 - **errors**: Custom error display. Receives slot props: `id`, `value`, `item`, `required`, `disabled`, `readonly`, `validateTrigger`.
+- **option-list**: Custom rendering of the dropdown's option list, replacing the default list markup entirely. Receives slot props:
+
+  | Prop            | Type     | Description                                                                 |
+  |-----------------|----------|-------------------------------------------------------------------------------|
+  | items           | Array    | The parsed/grouped list of options to render (includes synthesized group header items when `groupField` is used). |
+  | selectedValue   | Any      | The currently selected value, for comparison against each option.            |
+  | listItemValue   | Function | `(item) => value` — resolves an option's value using `valueField`.           |
+  | listItemText    | Function | `(item) => text` — resolves an option's display text using `textField`.      |
+  | isSelected      | Function | `(item) => boolean` — whether the given option matches `selectedValue`.      |
+  | selectOption    | Function | `(item) => void` — selects the given option and closes the dropdown.         |
+  | isGroupItem     | Function | `(item) => boolean` — whether the given option is a synthesized group header (not individually selectable). |
+
+  These are the same functions and data used internally to render the default option list, so you can use them to fully reproduce the default behavior or extend it (e.g., adding icons, descriptions, or custom grouping markup) while preserving selection, grouping, and accessibility semantics.
+
+  ### Example: customizing option rendering
+
+  ```vue
+  <cui-dropdown v-model="value" :list-items="items" value-field="id" text-field="name">
+    <template v-slot:option-list="{ items, isSelected, isGroupItem, selectOption, listItemValue, listItemText }">
+      <div v-for="option in items"
+           :key="listItemValue(option)"
+           :role="isGroupItem(option) ? 'presentation' : 'option'"
+           :class="{ selected: isSelected(option), 'option-group': isGroupItem(option) }"
+           @click.stop="selectOption(option)">
+        <span v-if="!isGroupItem(option)" class="icon" :class="option.icon"></span>
+        {{ listItemText(option) }}
+      </div>
+    </template>
+  </cui-dropdown>
+  ```
 
 ## Accessibility
 

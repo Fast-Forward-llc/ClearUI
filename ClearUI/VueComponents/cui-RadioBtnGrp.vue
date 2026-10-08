@@ -188,7 +188,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             this.Name = this.name ?? this.Id;
         },
         mounted() {
-
+            this.internalValue = this.modelValue;
         },
     };
 
