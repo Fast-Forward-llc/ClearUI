@@ -12,6 +12,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             :aria-activedescendant="activeDescendantId"
             :aria-labelledby="label ? `${Id}-label` : `${Id}-container`"
             :aria-invalid="isInvalid"
+            :aria-multiselectable="multiselect"
             v-on:focus="onFocus"
             v-on:focusout="onFocusOut"
             v-bind="$attrs">
@@ -28,7 +29,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     :tabindex="-1"
                     :class="{selected:isSelected(item)}"
                     :aria-selected="isSelected(item)"
-                    @click.stop="selectItem(item)">
+                    @click.stop="onItemClick(item, idx, $event)">
                     <slot name="list-item-content"
                         :item="item"
                         :index="idx"
@@ -65,7 +66,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
               :readonly="readonly"
               :validateTrigger="valTrigger">
         </slot>
-        <input ref="input" type="hidden" :id="Id" :name="Name" :value="selectedValue"/>
+        <input ref="input" type="hidden" :id="Id" :name="Name" :value="serializedValue"/>
     </div>
 </template>
 
@@ -86,6 +87,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             required: { type: Boolean, default: false },
             disabled: { type: Boolean, default: false },
             readonly: { type: Boolean, default: false },
+            multiselect: { type: Boolean, default: false },
         },
         emits: ['update:model-value', 'blur', 'click', 'focus', 'input', 'change', 'error', 'clear-error'],
         data() {
@@ -100,6 +102,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 internalList: null,
                 valTrigger: 0,
                 activeDescendantId: null,
+                lastSelectedIdx: null,
             };
         },
         computed: {
@@ -109,22 +112,35 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 },
                 set(i) {
                     this.currValue = i;
-                    this.currItem = this.itemFromValue(i);
+                    this.currItem = this.multiselect ? null : this.itemFromValue(i);
                 }
             },
             selectedItem() {
                 return this.currItem;
             },
+            selectedItems() {
+                if (!Array.isArray(this.currValue)) return [];
+                return this.currValue.map(v => this.itemFromValue(v)).filter(i => i != null);
+            },
+            serializedValue() {
+                return JSON.stringify(this.selectedValue ?? null);
+            },
         },
         watch: {
             modelValue(newVal) {
-                if (this.currValue != newVal) {
+                if (this.multiselect) {
+                    if (!arraysEqual(this.currValue, newVal)) this.setValue(newVal, true);
+                } else if (this.currValue != newVal) {
                     this.setValue(newVal, true);
                 }
             },
+            multiselect(newVal) {
+                const converted = this.coerceValue(this.currValue, newVal);
+                this.setValue(converted, null, true);
+            },
             listItems: {
                 handler(newVal) {
-                    this.$nextTick(() => this.currItem = this.itemFromValue(this.selectedValue));
+                    this.$nextTick(() => this.currItem = this.multiselect ? null : this.itemFromValue(this.selectedValue));
                 },
                 immediate: true
             },
@@ -135,11 +151,56 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             },
             isSelected(item) {
                 if (item == null) return false;
-                return this.listItemValue(item) == this.selectedValue;
+                const val = this.listItemValue(item);
+                if (this.multiselect) {
+                    return Array.isArray(this.selectedValue) && this.selectedValue.some(v => v == val);
+                }
+                return val == this.selectedValue;
+            },
+            onItemClick(item, idx, e) {
+                if (this.disabled || this.readonly) return;
+                if (this.multiselect && e && e.shiftKey && this.lastSelectedIdx != null) {
+                    this.selectRange(this.lastSelectedIdx, idx);
+                } else if (this.multiselect && e && (e.ctrlKey || e.metaKey)) {
+                    this.toggleItem(item);
+                    this.lastSelectedIdx = idx;
+                } else if (this.multiselect) {
+                    this.setValue([this.listItemValue(item)]);
+                    this.lastSelectedIdx = idx;
+                } else {
+                    this.selectItem(item);
+                    this.lastSelectedIdx = idx;
+                }
+            },
+            selectRange(fromIdx, toIdx) {
+                if (this.listItems == null) return;
+                const start = Math.min(fromIdx, toIdx);
+                const end = Math.max(fromIdx, toIdx);
+                const rangeValues = this.listItems.slice(start, end + 1).map(i => this.listItemValue(i));
+                this.setValue(rangeValues);
+            },
+            toggleItem(item) {
+                let curr = Array.isArray(this.currValue) ? [...this.currValue] : [];
+                const val = this.listItemValue(item);
+                const idx = curr.findIndex(v => v == val);
+                if (idx >= 0) curr.splice(idx, 1);
+                else curr.push(val);
+                this.setValue(curr);
             },
             selectItem(item) {
                 if (this.disabled || this.readonly) return;
                 this.setValue(this.listItemValue(item));
+            },
+            coerceValue(val, toMultiselect) {
+                if (toMultiselect) {
+                    if (val == null) return null;
+                    if (Array.isArray(val)) return val;
+                    return [val];
+                } else {
+                    if (!Array.isArray(val)) return val;
+                    if (val.length == 0) return null;
+                    return val[0];
+                }
             },
             listItemValue(item) {
                 return !this.valueField ? item : item[this.valueField];
@@ -152,6 +213,11 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 if (this.listItems == null) return null;
                 let item = this.listItems.find(i => this.listItemValue(i) == val);
                 return item;
+            },
+            itemFromListElement(el) {
+                if (!el || this.listItems == null) return null;
+                const idx = Array.from(this.$refs.listbox.querySelectorAll(this.itemElementType)).indexOf(el);
+                return idx >= 0 ? this.listItems[idx] : null;
             },
             setValue(val, e, forceEmit) {
                 if (this.disabled || this.readonly) return;
@@ -218,9 +284,18 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                         break;
 
                     case 'Enter':
-                    case ' ':
                         e.preventDefault();
                         e.target.click();
+                        break;
+
+                    case ' ':
+                        e.preventDefault();
+                        if (this.multiselect) {
+                            const item = this.itemFromListElement(target);
+                            if (item) this.toggleItem(item);
+                        } else {
+                            e.target.click();
+                        }
                         break;
 
                     case ('escape'):
@@ -338,11 +413,18 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             this.Name = (this.name == null) ? this.Id : this.name;
         },
         mounted() {
-            this.currValue = this.modelValue;
+            this.currValue = this.coerceValue(this.modelValue, this.multiselect);
         }
     };
 
     let cnt = 0;
+    function arraysEqual(a, b) {
+        if (a === b) return true;
+        if (!Array.isArray(a) || !Array.isArray(b)) return false;
+        if (a.length != b.length) return false;
+        for (let i = 0; i < a.length; i++) if (a[i] != b[i]) return false;
+        return true;
+    }
 </script>
 
 <style>

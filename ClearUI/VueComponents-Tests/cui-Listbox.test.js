@@ -44,4 +44,75 @@ describe('cui-listbox', () => {
         });
         expect(wrapper.text()).toContain('No items available');
     });
+
+    it('serializes the selected value as JSON into the hidden input', async () => {
+        const wrapper = mount(CuiListbox, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: 2 }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('input[type=hidden]').element.value).toBe('2');
+    });
+
+    it('multiselect: ctrl+click toggles values in an array', async () => {
+        const wrapper = mount(CuiListbox, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: [1], multiselect: true }
+        });
+        const options = wrapper.findAll('[role=option]');
+        await options[1].trigger('click', { ctrlKey: true }); // add id 2
+        expect(wrapper.emitted('update:model-value').at(-1)).toEqual([[1, 2]]);
+    });
+
+    it('multiselect: ctrl+click on a selected option removes it', async () => {
+        const wrapper = mount(CuiListbox, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: [1, 2], multiselect: true }
+        });
+        const options = wrapper.findAll('[role=option]');
+        await options[0].trigger('click', { ctrlKey: true }); // remove id 1
+        expect(wrapper.emitted('update:model-value').at(-1)).toEqual([[2]]);
+    });
+
+    it('multiselect: plain click selects only the clicked item', async () => {
+        const wrapper = mount(CuiListbox, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: [1, 2], multiselect: true }
+        });
+        const options = wrapper.findAll('[role=option]');
+        await options[2].trigger('click');
+        expect(wrapper.emitted('update:model-value').at(-1)).toEqual([[3]]);
+    });
+
+    it('multiselect: shift+click selects a range from the last selected item', async () => {
+        const wrapper = mount(CuiListbox, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: [], multiselect: true }
+        });
+        const options = wrapper.findAll('[role=option]');
+        await options[0].trigger('click'); // select id 1, lastSelectedIdx=0
+        await options[2].trigger('click', { shiftKey: true }); // range 0..2
+        expect(wrapper.emitted('update:model-value').at(-1)).toEqual([[1, 2, 3]]);
+    });
+
+    it('converts a single value to a one-item array when multiselect becomes true', async () => {
+        const wrapper = mount(CuiListbox, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: 2, multiselect: false }
+        });
+        await wrapper.setProps({ multiselect: true });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.emitted('update:model-value').at(-1)).toEqual([[2]]);
+    });
+
+    it('converts a non-empty array to its first value when multiselect becomes false', async () => {
+        const wrapper = mount(CuiListbox, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: [2, 3], multiselect: true }
+        });
+        await wrapper.setProps({ multiselect: false });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.emitted('update:model-value').at(-1)).toEqual([2]);
+    });
+
+    it('sets aria-multiselectable on the listbox when multiselect is enabled', () => {
+        const wrapper = mount(CuiListbox, {
+            props: { listItems: items, valueField: 'id', textField: 'name', multiselect: true }
+        });
+        expect(wrapper.find('[role=listbox]').attributes('aria-multiselectable')).toBe('true');
+    });
 });

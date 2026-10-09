@@ -110,4 +110,29 @@ describe('cui-dropdown', () => {
         expect(customOpts.length).toBe(3);
         expect(customOpts[0].text()).toBe('One');
     });
+
+    it('serializes the selected value as JSON into the hidden input', async () => {
+        const wrapper = mount(CuiDropdown, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: 2 }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('input[type=hidden]').element.value).toBe('2');
+    });
+
+    it('serializes a multiselect array value as JSON into the hidden input', async () => {
+        const wrapper = mount(CuiDropdown, {
+            props: { listItems: items, valueField: 'id', textField: 'name', modelValue: [1, 2], multiselect: true }
+        });
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('input[type=hidden]').element.value).toBe('[1,2]');
+    });
+
+    it('sets aria-multiselectable on the listbox when multiselect is enabled', () => {
+        const wrapper = mount(CuiDropdown, {
+            props: { listItems: items, valueField: 'id', textField: 'name', multiselect: true }
+        });
+        expect(wrapper.find('[role=listbox]').attributes('aria-multiselectable')).toBe('true');
+    });
 });

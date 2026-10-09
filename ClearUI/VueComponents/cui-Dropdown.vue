@@ -7,11 +7,12 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
         <div ref="container" class="dropdown-container">
             <label :for="Id" v-if="this.label">{{ label }}</label>
             <div ref="dropdown" class="dropdown" @click="toggleDropdown" role="combobox" tabindex="0" v-on:focusout="onFocusOut" v-on:focus="onFocus" v-on:keydown="onKeydown" :style="{'anchor-name':'--'+Id}">
-                <input ref="input" type="text" :id="Id" :name="Name" :value="selectedText" tabindex="-1" :placeholder="placeholder" autocomplete="false"
+                <input ref="input" type="text" :id="Id" :value="selectedText" tabindex="-1" :placeholder="placeholder" autocomplete="false"
                        :aria-invalid="isInvalid" v-on:focus="onFocus_Input" v-on:mousedown="noop" v-on:click="noop" />
+                <input ref="hiddenInput" type="hidden" :name="Name" :value="serializedValue" />
                 <span class="symbols expander"></span>
             </div>
-            <dialog ref="list" class="dropdown-list" role="listbox" tabindex="-1" v-on:focusout="onFocusOut" v-on:keydown.stop="onKeydown_list" 
+            <dialog ref="list" class="dropdown-list" role="listbox" tabindex="-1" :aria-multiselectable="multiselect" v-on:focusout="onFocusOut" v-on:keydown.stop="onKeydown_list" 
                     :style="{'position-anchor':'--'+Id, 'container-name':Id}">
                 <slot name="option-list" :items="internalList" :selectedValue="selectedValue" :listItemValue="listItemValue" :listItemText="listItemText" :isSelected="isSelected" :selectOption="selectOption" :isGroupItem="isGroupItem" >
                     <div v-for="option in internalList"
@@ -119,6 +120,9 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             selectedItems() {
                 if (!Array.isArray(this.currValue)) return [];
                 return this.currValue.map(v => this.itemFromValue(v)).filter(i => i != null);
+            },
+            serializedValue() {
+                return JSON.stringify(this.selectedValue ?? null);
             },
         },
         watch: {

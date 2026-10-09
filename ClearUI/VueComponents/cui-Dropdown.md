@@ -109,9 +109,14 @@ If `multiselect` changes after the component has a value, `modelValue` is automa
 
 This conversion updates `modelValue` via the normal `update:model-value` emit, so a parent bound with `v-model` will see the converted value reflected back automatically.
 
+### Form submission
+
+The component renders a hidden `<input type="hidden">` whose value is the selected value JSON-serialized (`JSON.stringify`), so it supports primitives, whole objects, and arrays of either (the multiselect case) in a single form field. On the server (e.g., in a Razor Pages handler), deserialize the posted string with `System.Text.Json` to recover the original value or array of values.
+
 ## Accessibility
 
 - The dropdown control uses `role="combobox"` and the options list uses `role="listbox"` with individual options marked `role="option"`.
+- The options list sets `aria-multiselectable` to match the `multiselect` prop.
 - Grouped items are rendered with `role="group"`/`role="presentation"` and an `aria-label` matching the group heading.
 - Selected options are marked with `aria-selected`.
 - Uses `aria-invalid` on the input to indicate validation state.
