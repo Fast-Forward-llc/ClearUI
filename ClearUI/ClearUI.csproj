@@ -25,6 +25,17 @@
 		<Message Text="Running JavaScript build: npm install and npm run build" Importance="high" />
 		<Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)" />
 	</Target>
+	<!--
+	Runs the vitest unit test suite for the Vue components (VueComponents-Tests).
+	This target is NOT part of the normal build by default. Build with
+	`-p:RunJsUnitTests=true` (or `dotnet build /p:RunJsUnitTests=true`) to run the tests as part of the build,
+	or invoke it directly with `dotnet build -t:RunJsTests` / `msbuild -t:RunJsTests`.
+  -->
+	<Target Name="RunJsTests" DependsOnTargets="NpmInstall">
+		<Message Text="Running JavaScript unit tests: npm test" Importance="high" />
+		<Exec Command="npm test" WorkingDirectory="$(MSBuildProjectDirectory)" />
+	</Target>
+	<Target Name="RunJsTestsIfRequested" BeforeTargets="Build" DependsOnTargets="RunJsTests" Condition="'$(RunJsUnitTests)' == 'true'" />
 	<Target Name="CreateNpmPackage" AfterTargets="Publish">
 		<ItemGroup>
 			<DistFiles Include="$(MSBuildProjectDirectory)\dist\**\*" />
