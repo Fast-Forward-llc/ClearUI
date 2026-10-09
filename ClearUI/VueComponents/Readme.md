@@ -33,7 +33,10 @@ ClearUI Vue Components is a collection of reusable, accessible, and form-friendl
 2. Use the components in your templates, binding to your data and validation logic.
 3. Refer to the individual component documentation for detailed usage, props, events, and slots.
 
-For more examples and advanced usage, see the demo app or each component's markdown file.
+```vue
+import { components } from 'clear-ui'
+components.registerAll(myVueApp);
+```
 
 ## Basic Examples
 
