@@ -3,8 +3,8 @@ Copyright (c) Fast Forward, LLC. All rights reserved.
 Licensed under the MIT License. See LICENSE file in the project root for full license information.
 -->
 <template>
-    <div ref="component" id="`${Id}-container`" class="cui cui-listbox" v-bind:class="{disabled:disabled, readonly:readonly}" v-on:keydown="onKeydown">
-        <span class="label" v-if="label" :id="`${Id}`-label">{{ label }}</span>
+    <div ref="component" :id="Id+'-container'" class="cui cui-listbox" v-bind:class="{disabled:disabled, readonly:readonly}" v-on:keydown="onKeydown">
+        <span class="label" v-if="label" :id="Id+'-label'">{{ label }}</span>
         <ul ref="listbox"
             class="listbox"
             role="listbox"

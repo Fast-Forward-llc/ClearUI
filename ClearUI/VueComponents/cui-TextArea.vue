@@ -215,3 +215,8 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
     };
     let cnt = 0;
 </script>
+<style>
+    .cui-textbox textarea {
+        width: 100%
+    }
+</style>
