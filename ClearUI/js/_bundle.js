@@ -2,7 +2,9 @@
 import { ValError, ValErrorEvent } from './ValError.js';
 import { DialogConfigEvent } from './PopupDialog.js';
 import ErrorList from './ErrorList.js';
-import { nextTock } from './Common.js'; 
+import { nextTock } from './Common.js'; //TypedConfigBase
+import { TypedConfigBase } from './TypedConfigBase.js';
+import { ActionBtnConfig } from './ActionBtnConfig.js';
 
 const bundle = {
     nextTock,
@@ -11,6 +13,8 @@ const bundle = {
     ValErrorEvent,
     ErrorList,
     DialogConfigEvent,
+    TypedConfigBase,
+    ActionBtnConfig,
 };
 
 export default bundle

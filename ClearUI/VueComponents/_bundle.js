@@ -29,6 +29,7 @@ import cui_FspDebounce from './cui-FspDebounce.vue';
 import cui_VirtualScroll from './cui-VirtualScroll.vue';
 import cui_Accordion from './cui-Accordion.vue';
 import cui_Tabbed from './cui-Tabbed.vue';
+import cui_DateRange from './cui-DateRange.vue';
 
 
 const bundle = {
@@ -63,6 +64,7 @@ const bundle = {
     "cui-virtual-scroll": cui_VirtualScroll,
     "cui-accordion": cui_Accordion,
     "cui-tabbed": cui_Tabbed,
+    "cui-date-range": cui_DateRange,
 };
 
 export default bundle

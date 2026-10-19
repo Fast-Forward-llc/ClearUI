@@ -16,7 +16,6 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
 </template>
 
 <script>
-    import { nextTock } from '../js/common.js';
     export default {
         props: {
             scrollElementSelector: { type: String, required: true },
@@ -606,10 +605,6 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
         },
         mounted() {
             this.reattachScrollElement();
-            //initialize dataset. if dataset length is falsey on mount, trigger a tail load
-            //nextTock(() => {
-            //    if (!this.datasetLength) this.triggerTail();
-            //});
         },
         beforeUnmount() {
             this.detachScrollListener();

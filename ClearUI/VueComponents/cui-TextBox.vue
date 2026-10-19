@@ -5,21 +5,31 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
 <template>
     <div class="cui cui-textbox" v-bind:class="{'disabled':disabled,'readonly':readonly,'required':required}" ref="textbox">
         <label :for="Id" v-if="this.label">{{label}}</label>
-        <input :id="Id" ref="input" v-bind="$attrs" 
-               :name="Name" 
-               :type="type" 
-               v-model="CurrValue" 
-               :placeholder="placeholder"
-               :required="required"
-               :readonly="disabled||readonly"
-               :aria-invalid="IsInvalid"
-               :aria-describedby="this.Id+'_valmsg'"
-               v-on:focus="onFocus"
-               v-on:blur="onBlur"
-               v-on:change="onChange"
-               v-on:input="onInput"
-               v-on:keyup="keyup"
-               v-on:keydown="keydown" />
+        <div class="input-wrap">
+            <input :id="Id" ref="input" v-bind="$attrs"
+                   :name="Name"
+                   :type="type"
+                   v-model="CurrValue"
+                   :placeholder="placeholder"
+                   :required="required"
+                   :readonly="disabled||readonly"
+                   :aria-invalid="IsInvalid"
+                   :aria-describedby="this.Id+'_valmsg'"
+                   v-on:focus="onFocus"
+                   v-on:blur="onBlur"
+                   v-on:change="onChange"
+                   v-on:input="onInput"
+                   v-on:keyup="keyup"
+                   v-on:keydown="keydown" />
+            <button v-if="actionBtnConfig?.icon"
+                    type="button"
+                    class="cui-textbox-btn"
+                    :aria-label="actionBtnConfig?.label"
+                    :title="actionBtnConfig?.title"
+                    @click="actionBtnConfig?.onClick">
+                <span class="symbols">{{actionBtnConfig?.icon}}</span>
+            </button>
+        </div>
         <div class="errors" role="status" :id="this.Id+'_valmsg'">
             <slot name="errors" :id="Id"
                   :value="lastEmittedValue"
@@ -28,9 +38,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                   :readonly="readonly"
                   :validityInfo="validityInfo"
                   :validateTrigger="valTrigger">
-                {{error_msg}}
-            </slot>
-        </div>
+                {{error_msg
+                    }}
+                    </slot>
+</div>
         <slot v-if="$slots.default"
               :id="Id"
               :value="lastEmittedValue"
@@ -43,7 +54,8 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
     </div>
 </template>
 <script>
-    import InputComponentBase from '../js/InputComponentBase.js';
+    import { ActionBtnConfig } from '../js/ActionBtnConfig.js';
+import InputComponentBase from '../js/InputComponentBase.js';
 
     export default {
         extends:InputComponentBase,
@@ -60,11 +72,15 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             placeholder: { type: String },
             modelModifiers: null,
             formatter: { type: Function, default: null },
+            // Input mask: 9 = digit, a = letter, * = letter or digit, # = optional digit, ? = optional letter,
+            // any other character is a literal. Precede a mask character with \ to use it as a literal (e.g. \# or \?).
+            mask: { type: String, default: null },
             keyFilter: {
                 type: Function,
 
                 default: null
             },
+            actionBtnConfig: {type: ActionBtnConfig},
         },
         data() {
             return {
@@ -96,9 +112,66 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             },
             onInput(e) {
                 if (this.disabled || this.readonly) return;
+                if (this.mask && e?.target && typeof e.target.value === 'string') {
+                    const el = e.target;
+                    const raw = el.value;
+                    const masked = this.applyMask(raw);
+                    if (masked !== raw) {
+                        const caret = el.selectionStart ?? raw.length;
+                        const newCaret = this.applyMask(raw.slice(0, caret)).length;
+                        el.value = masked;
+                        if (document.activeElement === el && el.setSelectionRange) el.setSelectionRange(newCaret, newCaret);
+                    }
+                }
                 if (e) this.evalValidity(e);
                 this.$emit('input', e);
                 if (e?.detail == 'ForceEmit') this.emitValue(e?.target?.value,true,e);
+            },
+            applyMask(raw) {
+                if (!this.mask || raw == null) return raw;
+                raw = raw.toString();
+                const matches = {
+                    '9': (c) => /[0-9]/.test(c),
+                    'a': (c) => /[A-Za-z]/.test(c),
+                    '*': (c) => /[A-Za-z0-9]/.test(c),
+                };
+                const optional = {
+                    '#': matches['9'],
+                    '?': matches['a'],
+                };
+                let out = '';
+                let pending = '';
+                let ri = 0;
+                for (let mi = 0; mi < this.mask.length; mi++) {
+                    let mc = this.mask[mi];
+                    let escaped = false;
+                    // A backslash makes the following mask character a literal (e.g. \# or \?).
+                    if (mc === '\\' && mi + 1 < this.mask.length) {
+                        mc = this.mask[++mi];
+                        escaped = true;
+                    }
+                    const optTest = escaped ? null : optional[mc];
+                    if (optTest) {
+                        // Optional slot: consume the next character only if it fits, otherwise skip the slot.
+                        if (ri < raw.length && optTest(raw[ri])) {
+                            out += pending + raw[ri++];
+                            pending = '';
+                        }
+                        continue;
+                    }
+                    const test = escaped ? null : matches[mc];
+                    if (!test) {
+                        // Literals are only emitted once a following character is accepted.
+                        pending += mc;
+                        if (raw[ri] === mc) ri++;
+                        continue;
+                    }
+                    while (ri < raw.length && !test(raw[ri])) ri++;
+                    if (ri >= raw.length) break;
+                    out += pending + raw[ri++];
+                    pending = '';
+                }
+                return out;
             },
             onClick(e) {
                 if (this.readonly || this.disabled) return;
@@ -149,6 +222,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     return this.currValue;
                 },
                 set(newValue) {
+                    if (this.mask && typeof newValue === 'string') newValue = this.applyMask(newValue);
                     if (this.currValue == newValue || !this.currValue && !newValue) return;
                     this.currValue = newValue;
                     this.emitValue(newValue);
@@ -185,3 +259,19 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
     };
     let cnt = 0;
 </script>
+<style>
+    .cui-textbox .input-wrap{
+        display:flex;
+    }
+    .cui-textbox-btn,
+    .cui-textbox-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem;
+        border: var(--ctrl-borders);
+        background: var(--color-ctrl-background);
+        color: var(--color-text);
+        cursor: pointer;
+    }
+</style>

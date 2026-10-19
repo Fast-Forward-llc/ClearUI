@@ -1,6 +1,7 @@
 # ClearUI
 
-ClearUI is a collection of reusable, accessible Vue.js UI components paired with ASP.NET Core Razor Pages tag helpers, designed to make it easy to build enterprise and business web applications with a consistent look and feel, robust validation, and seamless server-side form integration.
+ClearUI is a collection of reusable, accessible Vue.js UI components paired with ASP.NET Core Razor tag helpers, designed to make it easy to build enterprise and business web applications with a consistent look and feel, robust validation, and seamless server-side form integration.
+ClearUI components work with any Vue SPA or MPA application. TagHelpers offer additional synergy when the components are used with an ASP.Net Razor view or page.
 
 ## Solution Structure
 

@@ -32,6 +32,8 @@ A flexible textbox component supporting various input types, validation, accessi
 | modelModifiers      | Object    | —         | Vue v-model modifiers (e.g., `lazy`, `trim`, `number`).                     |
 | formatter           | Function  | null      | Custom value formatter.                                                     |
 | keyFilter           | Function  | null      | Custom key filter for input.                                                |
+| mask                | String    | null      | Input mask that formats the value and discards invalid characters. See [Input Mask](#input-mask). |
+| actionBtnConfig     | ActionBtnConfig | —   | Configures an action button displayed beside the input. The button is only rendered when `icon` is set. See [Action Button](#action-button). |
 | errorEventSelector  | String    | null      | CSS selector for dispatching error events to other elements.                |
 | bubblesErrors     | Boolean  | true      | Controls if validation errors bubble to parent elements.           |
 
@@ -66,8 +68,71 @@ A flexible textbox component supporting various input types, validation, accessi
 - Native and custom validation with error priority and event-based error handling.
 - Works with `v-model` and `v-model.lazy`.
 - Supports custom formatting and key filtering.
+- Supports input masks via the `mask` prop.
+- Optional action button configured with `actionBtnConfig`.
 - Error events can be dispatched to other elements using `errorEventSelector`.
 - Conditionally renders slots only when used.
+
+## Input Mask
+
+The `mask` prop defines a pattern the textbox enforces as the user types or pastes. Characters that don't fit the next mask position are discarded and literal characters are inserted automatically.
+
+| Mask character | Accepts                    |
+|----------------|----------------------------|
+| `9`            | A digit (0-9)              |
+| `a`            | A letter (A-Z, a-z)        |
+| `*`            | A letter or a digit        |
+| `#`            | An optional digit (0-9)    |
+| `?`            | An optional letter (A-Z, a-z) |
+| anything else  | A literal inserted as-is   |
+| `\` + a mask character | That character as a literal (e.g. `\#`, `\?`, `\9`) |
+
+```vue
+<cui-textbox v-model="phone" label="Phone" mask="(999) 999-9999" />
+<cui-textbox v-model="code" label="Code" mask="aa-9999" />
+<cui-textbox v-model="zip" label="ZIP" mask="99999-####" />
+<cui-textbox v-model="ticket" label="Ticket" mask="\#9999" />
+```
+
+Notes:
+
+- Escape a mask character with a preceding backslash to use it as a literal. `\#9999` always starts with a literal `#`, and `999\?` ends with a literal `?`. In a JavaScript string literal the backslash must itself be escaped (`'\\#9999'`); in a template attribute (`mask="\#9999"`) it is written as is.
+- A trailing backslash with nothing after it is treated as a literal backslash.
+- An optional character (`#` or `?`) is skipped when the next typed character doesn't fit it, and the mask moves on to the following position. With `99999-####`, typing `12345` shows `12345`, and each further digit fills the optional slots after the `-`.
+- Optional characters are not padded, so the value can be shorter than the mask.
+- A literal is only inserted once a following character is accepted, so typing `5` into `(999) 999-9999` displays `(5`.
+- The mask also applies to values set externally through `v-model` or `value`.
+- The emitted value is the formatted text (e.g. `(555) 123-4567`), not the raw characters.
+- The mask does not validate completeness. A partially filled value is accepted and emitted as typed.
+
+## Action Button
+
+The `actionBtnConfig` prop adds a button beside the input, for example to open a picker or lookup. The button is rendered only when `icon` is set.
+
+The prop takes an `ActionBtnConfig` instance. Create one with `jsUtils.ActionBtnConfig.FromObject({...})`.
+
+| Property | Type     | Description                                                                                                  |
+|----------|----------|--------------------------------------------------------------------------------------------------------------|
+| icon     | String   | **Required to show the button.** The name of a [Google Material Symbols](https://fonts.google.com/icons) icon, for example `more_horiz` or `search`. |
+| onClick  | Function | Called when the button is clicked. Receives the click event.                                                 |
+| label    | String   | Accessible name for the button, used as its `aria-label`. Set this since the button only contains an icon.   |
+| title    | String   | Defined on `ActionBtnConfig`, but not currently applied to the button by `cui-textbox`.                      |
+
+> **Note:** `icon` must be the Google Material Symbols icon name (the ligature text), not a CSS class or image URL.
+
+```vue
+<cui-textbox v-model="email" label="Email address" :action-btn-config="btnConfig" />
+```
+
+```javascript
+import { components, jsUtils } from 'clear-ui';
+
+const btnConfig = jsUtils.ActionBtnConfig.FromObject({
+    icon: 'more_horiz',
+    label: 'More options',
+    onClick: () => { alert('button click'); },
+});
+```
 
 ## Validation
 
