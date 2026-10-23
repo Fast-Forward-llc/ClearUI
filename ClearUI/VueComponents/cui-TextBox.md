@@ -26,6 +26,7 @@ A flexible textbox component supporting various input types, validation, accessi
 | type                | String    | —         | Input type (`text`, `number`, `date`, etc.).                                |
 | required            | Boolean   | false     | Whether the field is required.                                              |
 | disabled            | Boolean   | false     | Disables the input.                                                         |
+| validateOn | Any | null | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 | readonly            | Boolean   | false     | Makes the input read-only.                                                  |
 | placeholder         | String    | —         | Placeholder text.                                                           |
 | errorMsg            | String    | —         | Error message to display.                                                   |
@@ -104,6 +105,37 @@ Notes:
 - The mask also applies to values set externally through `v-model` or `value`.
 - The emitted value is the formatted text (e.g. `(555) 123-4567`), not the raw characters.
 - The mask does not validate completeness. A partially filled value is accepted and emitted as typed.
+
+## Native Validation
+
+`cui-textbox` uses the browser's built-in constraint validation. Standard attributes such as `required`, `type` (`number`, `date`, `email`, ...), `min`, `max`, `minlength`, `maxlength`, `step` and `pattern` are applied to the embedded `<input>`, and the component reflects the result automatically:
+
+- When the value fails a native constraint, the browser's `validationMessage` is displayed in the errors area, `aria-invalid` is set, and an `error` event is emitted (and bubbled when `bubbleErrors` is `true`).
+- When the value becomes valid, the error is cleared and `clear-error` is emitted.
+- The native constraint flags (`valueMissing`, `rangeOverflow`, `rangeUnderflow`, `typeMismatch`, ...) are exposed as `validityInfo` on the `errors` slot props.
+
+```vue
+<cui-textbox v-model="qty" type="number" label="Quantity" :required="true" min="1" max="10" />
+```
+
+### Overriding native messages with `cui-valmsg`
+
+Browser messages are generic and localized by the browser. To show your own message, place a [`cui-valmsg`](cui-ValMsg.md) in the default slot with a `priority` higher than the native error's priority of `98`. The input shows only the highest priority error, so the custom message replaces the native one while the field is invalid. If the custom `expr` passes, the native message (if any) is shown again.
+
+```vue
+<cui-textbox v-model="qty" type="number" label="Quantity" :required="true" min="1" max="10" v-slot="ctrl">
+  <cui-valmsg :expr="$vFn.isRequired(ctrl?.value, ctrl?.required)"
+              msg="Please enter a quantity."
+              :priority="99"
+              :trigger-on="ctrl.validateTrigger" />
+</cui-textbox>
+```
+
+Notes:
+
+- `cui-valmsg` defaults to `priority` `1`, which is lower than the native error, so a custom message must set a priority above `98` (for example `99`) to take precedence.
+- Use different priorities when several custom messages can fail together. The highest one is displayed.
+- Use the `errors` slot instead if you need to replace how the error is rendered, rather than just its text.
 
 ## Action Button
 

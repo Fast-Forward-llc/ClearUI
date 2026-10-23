@@ -82,6 +82,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             readonly: { type: Boolean, default: false },
             required: { type: Boolean, default: false },
             modelModifiers: { type: Object, default: () => ({}) },
+            validateOn: null,
         },
         data() {
             return {
@@ -116,6 +117,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     this.emitValue(this.internalValue);
                 }
             },
+            validateOn(newVal) {
+                if (this.readonly || this.disabled) return;
+                if (newVal) this.valTrigger++;
+            }
         },
         methods: {
             isChecked(i) {

@@ -34,6 +34,7 @@ Unlike `cui-dropdown`, `cui-selectbox` renders a native `<select>`/`<option>` el
 | placeholder      | String    | —         | Placeholder attribute passed to the native `<select>`.                       |
 | required         | Boolean   | false     | Whether the field is required.                                               |
 | disabled         | Boolean   | false     | Disables the select box.                                                     |
+| validateOn | Any | null | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 | readonly         | Boolean   | false     | Makes the select box read-only.                                              |
 | errorMsg         | String    | —         | Error message to display.                                                    |
 | errorEventSelector | String  | null      | CSS selector for dispatching error events to other elements.                 |

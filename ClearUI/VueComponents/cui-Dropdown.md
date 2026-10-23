@@ -32,6 +32,7 @@ A flexible dropdown/select component supporting grouped options, custom value/te
 | placeholder      | String    | —         | Placeholder text.                                                            |
 | required         | Boolean   | false     | Whether the field is required.                                               |
 | disabled         | Boolean   | false     | Disables the dropdown.                                                       |
+| validateOn | Any | null | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 | readonly         | Boolean   | false     | Makes the dropdown read-only.                                                |
 | multiselect      | Boolean   | false     | Enables selecting multiple options. See [Multiselect](#multiselect) below.   |
 | errorMsg         | String    | —         | Error message to display.                                                    |
@@ -112,6 +113,38 @@ This conversion updates `modelValue` via the normal `update:model-value` emit, s
 ### Form submission
 
 The component renders a hidden `<input type="hidden">` whose value is the selected value JSON-serialized (`JSON.stringify`), so it supports primitives, whole objects, and arrays of either (the multiselect case) in a single form field. On the server (e.g., in a Razor Pages handler), deserialize the posted string with `System.Text.Json` to recover the original value or array of values.
+
+## Native Validation
+
+`cui-dropdown` supports native constraint validation through the `required` prop.
+
+- When `required` is `true` and nothing is selected, the field is invalid: the browser's `validationMessage` is displayed in the errors area, `aria-invalid` is set, and an `error` event is emitted (and bubbled when `bubbleErrors` is `true`).
+- With `multiselect`, an empty array is treated as no selection.
+- Selecting a value clears the error and emits `clear-error`.
+- Validation runs on blur and when the `validate-on` prop changes to a new truthy value.
+- The native constraint flags (such as `valueMissing`) are available through `validityInfo`.
+
+```vue
+<cui-dropdown v-model="value" label="Color" :list-items="items" value-field="id" text-field="name" :required="true" />
+```
+
+### Overriding native messages with `cui-valmsg`
+
+To show your own message instead of the browser's, place a [`cui-valmsg`](cui-ValMsg.md) in the default slot with a `priority` higher than the native error's priority of `98`. The dropdown shows only the highest priority error, so the custom message replaces the native one while the field is invalid.
+
+```vue
+<cui-dropdown v-model="value" label="Color" :list-items="items" value-field="id" text-field="name" :required="true" v-slot="ctrl">
+  <cui-valmsg :expr="$vFn.isRequired(ctrl?.value, ctrl?.required)"
+              msg="Please choose a color."
+              :priority="99"
+              :trigger-on="ctrl.validateTrigger" />
+</cui-dropdown>
+```
+
+Notes:
+
+- `cui-valmsg` defaults to `priority` `1`, which is lower than the native error, so set a priority above `98` (for example `99`) for the custom message to take precedence.
+- Use the `errors` slot instead if you need to replace how the error is rendered, rather than just its text.
 
 ## Accessibility
 

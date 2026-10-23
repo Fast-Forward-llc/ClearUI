@@ -18,8 +18,8 @@ class ErrorList {
     addError(valError) {
         if (!valError) return;
         if (valError && valError instanceof ValErrorEvent) valError = valError.valError;
-        if (!this.sloppyAdd(valError)) 
-            this.sort();
+        this.sloppyAdd(valError);
+        this.sort();
     }
 
     /**

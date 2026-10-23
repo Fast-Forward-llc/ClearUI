@@ -38,10 +38,9 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                   :readonly="readonly"
                   :validityInfo="validityInfo"
                   :validateTrigger="valTrigger">
-                {{error_msg
-                    }}
-                    </slot>
-</div>
+                {{error_msg}}
+            </slot>
+        </div>
         <slot v-if="$slots.default"
               :id="Id"
               :value="lastEmittedValue"
@@ -55,10 +54,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
 </template>
 <script>
     import { ActionBtnConfig } from '../js/ActionBtnConfig.js';
-import InputComponentBase from '../js/InputComponentBase.js';
+    import InputComponentBase from '../js/InputComponentBase.js';
 
     export default {
-        extends:InputComponentBase,
+        extends: InputComponentBase,
         emits: ['update:model-value', 'blur', 'focus', 'change', 'input', 'click', 'keyup', 'keydown', 'error', 'clear-error'],
         props: {
             id: { type: String },
@@ -80,7 +79,8 @@ import InputComponentBase from '../js/InputComponentBase.js';
 
                 default: null
             },
-            actionBtnConfig: {type: ActionBtnConfig},
+            actionBtnConfig: { type: ActionBtnConfig },
+            validateOn: null,
         },
         data() {
             return {
@@ -123,9 +123,8 @@ import InputComponentBase from '../js/InputComponentBase.js';
                         if (document.activeElement === el && el.setSelectionRange) el.setSelectionRange(newCaret, newCaret);
                     }
                 }
-                if (e) this.evalValidity(e);
                 this.$emit('input', e);
-                if (e?.detail == 'ForceEmit') this.emitValue(e?.target?.value,true,e);
+                if (e?.detail == 'ForceEmit') this.emitValue(e?.target?.value, true, e);
             },
             applyMask(raw) {
                 if (!this.mask || raw == null) return raw;
@@ -203,17 +202,21 @@ import InputComponentBase from '../js/InputComponentBase.js';
                     this.currValue = val?.toString() === '' ? null : val;
                     this.$emit('update:model-value', this.currValue);
                     this.lastEmittedValue = this.currValue;
-                    this.$nextTick(() => this.valTrigger++);
                 }
             },
             checkValidity(e, forceEmit) {
                 if (!e) {
-                    setTimeout(() => {
-                        this.$refs.input.checkValidity();
-                        this.$refs.input.dispatchEvent(new CustomEvent('input', { detail: 'ForceEmit' }));
-                    }, 0);
-                    return;
-                } else this.evalValidity(e, forceEmit);  
+                    e = {
+                        type: 'checkValidity',
+                        target: this.$refs.input,
+                        currentTarget: this.$refs.input,
+                        stopPropagation: () => { return; },
+                        preventDefault: () => { return; },
+                    }
+                }
+                e.target.checkValidity();
+                this.evalValidity(e, forceEmit);
+                this.$nextTick(() => this.valTrigger++);
             },
         },
         computed: {
@@ -248,7 +251,11 @@ import InputComponentBase from '../js/InputComponentBase.js';
                 if (newVal) this.clearValErrors();
             },
             required() {
-                this.checkValidity(null,true);
+                this.checkValidity(null, true);
+            },
+            validateOn(newVal) {
+                if (this.readonly || this.disabled) return;
+                if (newVal) this.checkValidity();
             }
         },
         created() {
@@ -260,9 +267,10 @@ import InputComponentBase from '../js/InputComponentBase.js';
     let cnt = 0;
 </script>
 <style>
-    .cui-textbox .input-wrap{
-        display:flex;
+    .cui-textbox .input-wrap {
+        display: flex;
     }
+
     .cui-textbox-btn,
     .cui-textbox-icon-btn {
         display: inline-flex;

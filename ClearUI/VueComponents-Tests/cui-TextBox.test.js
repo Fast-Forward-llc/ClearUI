@@ -155,4 +155,202 @@ describe('cui-textbox', () => {
             expect(wrapper.find('input').element.value).toBe('(555) 123-4567');
         });
     });
+
+    describe('checkValidity()', () => {
+        // Mounts a textbox, sets the raw input value and runs the component's checkValidity().
+        const validate = async (props, attrs, value) => {
+            const wrapper = mount(CuiTextBox, {
+                props: { modelValue: '', ...props },
+                attrs,
+                attachTo: document.body,
+            });
+            await wrapper.vm.$nextTick();
+            const input = wrapper.find('input');
+            input.element.value = value;
+            wrapper.vm.checkValidity();
+            // Snapshot synchronously: a later re-render resets the DOM value to the (empty) model value.
+            const validity = {};
+            for (const key in input.element.validity) validity[key] = input.element.validity[key];
+            wrapper.unmount();
+            return validity;
+        };
+
+        describe('required', () => {
+            it.each([
+                ['text', ''],
+                ['number', ''],
+                ['date', ''],
+            ])('type %s: empty value is invalid (valueMissing)', async (type, value) => {
+                const v = await validate({ type, required: true }, {}, value);
+                expect(v.valid).toBe(false);
+                expect(v.valueMissing).toBe(true);
+            });
+
+            it.each([
+                ['text', 'abc'],
+                ['number', '5'],
+                ['date', '2024-03-15'],
+            ])('type %s: a value is valid', async (type, value) => {
+                const v = await validate({ type, required: true }, {}, value);
+                expect(v.valid).toBe(true);
+                expect(v.valueMissing).toBe(false);
+            });
+
+            it.each(['text', 'number', 'date'])('type %s: empty value is valid when not required', async (type) => {
+                const v = await validate({ type }, {}, '');
+                expect(v.valid).toBe(true);
+            });
+        });
+
+        describe('number min/max', () => {
+            const attrs = { min: 5, max: 10 };
+
+            it('value below min is invalid (rangeUnderflow)', async () => {
+                const v = await validate({ type: 'number' }, attrs, '4');
+                expect(v.valid).toBe(false);
+                expect(v.rangeUnderflow).toBe(true);
+                expect(v.rangeOverflow).toBe(false);
+            });
+
+            it('value above max is invalid (rangeOverflow)', async () => {
+                const v = await validate({ type: 'number' }, attrs, '11');
+                expect(v.valid).toBe(false);
+                expect(v.rangeOverflow).toBe(true);
+                expect(v.rangeUnderflow).toBe(false);
+            });
+
+            it.each(['5', '7', '10'])('value %s within the range (inclusive) is valid', async (value) => {
+                const v = await validate({ type: 'number' }, attrs, value);
+                expect(v.valid).toBe(true);
+            });
+
+            it('only min set: a value above it is valid', async () => {
+                const v = await validate({ type: 'number' }, { min: 5 }, '1000');
+                expect(v.valid).toBe(true);
+            });
+
+            it('only max set: a value below it is valid', async () => {
+                const v = await validate({ type: 'number' }, { max: 10 }, '-1000');
+                expect(v.valid).toBe(true);
+            });
+
+            it('an empty value is valid when not required, even with min/max', async () => {
+                const v = await validate({ type: 'number' }, attrs, '');
+                expect(v.valid).toBe(true);
+            });
+        });
+
+        describe('date min/max', () => {
+            const attrs = { min: '2024-01-10', max: '2024-01-20' };
+
+            it('date before min is invalid (rangeUnderflow)', async () => {
+                const v = await validate({ type: 'date' }, attrs, '2024-01-09');
+                expect(v.valid).toBe(false);
+                expect(v.rangeUnderflow).toBe(true);
+                expect(v.rangeOverflow).toBe(false);
+            });
+
+            it('date after max is invalid (rangeOverflow)', async () => {
+                const v = await validate({ type: 'date' }, attrs, '2024-01-21');
+                expect(v.valid).toBe(false);
+                expect(v.rangeOverflow).toBe(true);
+                expect(v.rangeUnderflow).toBe(false);
+            });
+
+            it.each(['2024-01-10', '2024-01-15', '2024-01-20'])('date %s within the range (inclusive) is valid', async (value) => {
+                const v = await validate({ type: 'date' }, attrs, value);
+                expect(v.valid).toBe(true);
+            });
+
+            it('an empty value is valid when not required, even with min/max', async () => {
+                const v = await validate({ type: 'date' }, attrs, '');
+                expect(v.valid).toBe(true);
+            });
+        });
+
+        describe('text min/max', () => {
+            // min and max only apply to numeric and date input types; text inputs ignore them.
+            it('are ignored for type text', async () => {
+                const v = await validate({ type: 'text' }, { min: 5, max: 10 }, 'zzz');
+                expect(v.valid).toBe(true);
+                expect(v.rangeUnderflow).toBe(false);
+                expect(v.rangeOverflow).toBe(false);
+            });
+        });
+
+        describe('component state', () => {
+            const run = async (props, attrs, value) => {
+                const wrapper = mount(CuiTextBox, {
+                    props: { modelValue: '', ...props },
+                    attrs,
+                    attachTo: document.body,
+                });
+                await wrapper.vm.$nextTick();
+                const input = wrapper.find('input');
+                input.element.value = value;
+                wrapper.vm.checkValidity();
+                await wrapper.vm.$nextTick();
+                return wrapper;
+            };
+
+            it('a valid value leaves the component valid with no error message', async () => {
+                const wrapper = await run({ type: 'number', required: true }, { min: 1, max: 10 }, '5');
+                expect(wrapper.vm.inputIsValid).toBe(true);
+                expect(wrapper.vm.IsInvalid).toBe(false);
+                expect(wrapper.vm.validityInfo.valid).toBe(true);
+                wrapper.unmount();
+            });
+
+            // checkValidity() evaluates the input's validity for both valid and invalid values, so an invalid
+            // value updates the component's error state.
+            it('a required empty value marks the component invalid with an error message', async () => {
+                const wrapper = await run({ type: 'text', required: true }, {}, '');
+                expect(wrapper.vm.inputIsValid).toBe(false);
+                expect(wrapper.vm.IsInvalid).toBe(true);
+                expect(wrapper.vm.validityInfo.valueMissing).toBe(true);
+                wrapper.unmount();
+            });
+
+            it('a number above max marks the component invalid', async () => {
+                const wrapper = await run({ type: 'number' }, { max: 10 }, '11');
+                expect(wrapper.vm.inputIsValid).toBe(false);
+                expect(wrapper.vm.validityInfo.rangeOverflow).toBe(true);
+                wrapper.unmount();
+            });
+
+            it('a date before min marks the component invalid', async () => {
+                const wrapper = await run({ type: 'date' }, { min: '2024-01-10' }, '2024-01-09');
+                expect(wrapper.vm.inputIsValid).toBe(false);
+                expect(wrapper.vm.validityInfo.rangeUnderflow).toBe(true);
+                wrapper.unmount();
+            });
+
+            it('an invalid value sets the error message', async () => {
+                const wrapper = await run({ type: 'number' }, { max: 10 }, '11');
+                expect(wrapper.vm.error_msg).toBeTruthy();
+                expect(wrapper.vm.error_msg).toBe(wrapper.vm.nativeValidationMsg);
+                wrapper.unmount();
+            });
+
+            it('correcting an invalid value clears the invalid state and error message', async () => {
+                const wrapper = await run({ type: 'number' }, { min: 1, max: 10 }, '11');
+                expect(wrapper.vm.IsInvalid).toBe(true);
+                wrapper.find('input').element.value = '5';
+                wrapper.vm.checkValidity();
+                await wrapper.vm.$nextTick();
+                expect(wrapper.vm.inputIsValid).toBe(true);
+                expect(wrapper.vm.IsInvalid).toBe(false);
+                expect(wrapper.vm.validityInfo.rangeOverflow).toBe(false);
+                wrapper.unmount();
+            });
+
+            it('an invalid value emits an error event', async () => {
+                const wrapper = await run({ type: 'text', required: true }, {}, '');
+                const errors = wrapper.emitted('error');
+                expect(errors).toBeTruthy();
+                expect(errors.at(-1)[0].msg).toBeTruthy();
+                wrapper.unmount();
+            });
+        });
+    });
 });

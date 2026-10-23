@@ -35,6 +35,7 @@ A custom, accessible radio button group component for Vue.js. Renders a group of
 | uncheckedValue | Boolean/Number/String    | null      | Value when unselected (if allowUnselect is true).                  |
 | errorMsg       | String                   | —         | Error message to display.                                                   |
 | disabled       | Boolean                  | false     | Disables the radio group.                                          |
+| validateOn | Any | null | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 | readonly       | Boolean                  | false     | Makes the radio group read-only.                                   |
 | required       | Boolean                  | false     | Marks the radio group as required.                                 |
 | bubblesErrors  | Boolean                  | true      | Controls if validation errors bubble to parent elements.           |

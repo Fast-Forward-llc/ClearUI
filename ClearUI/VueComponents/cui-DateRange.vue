@@ -3,111 +3,155 @@ Copyright (c) Fast Forward, LLC. All rights reserved.
 Licensed under the MIT License. See LICENSE file in the project root for full license information.
 -->
 <template>
-    <div class="cui-date-range" ref="root">
-        <div class="cui-date-range-buttons">
-            <cui-textbox :key="'s' + startKey"
-                         :type="inputType()"
-                         :label="startDateLabel"
-                         class="cui-date-range-input start-input"
-                         :name="StartName"
-                         :model-value="inputValue(start)"
-                         :model-modifiers="{ lazy: true }"
-                         :mask="mask"
-                         :placeholder="placeholder"
-                         aria-label="Start date"
-                         @update:model-value="onInputChange('start', $event)"></cui-textbox>
-            <cui-textbox :key="'e' + endKey"
-                         :type="inputType()"
-                         :label="endDateLabel"
-                         class="cui-date-range-input end-input"
-                         :name="EndName"
-                         :model-value="inputValue(end)"
-                         :model-modifiers="{ lazy: true }"
-                         :mask="mask"
-                         :placeholder="placeholder"
-                         aria-label="End date"
-                         @update:model-value="onInputChange('end', $event)"
-                         :actionBtnConfig="PickerBtnConfig"></cui-textbox>
-            <button v-if="inputType()==='hidden'"
-                    class="cui-date-range-btn"
-                    :title="'From: ' + this.start + ' To: ' + this.end"
-                    aria-label="Open Date Range Picker"
-                    :aria-expanded="open"
-                    @click="togglePicker">
-                <span class="symbols">calendar_month</span>
-            </button>
-        </div>
-
-        <div v-show="open" class="cui-date-range-popup" role="dialog" aria-label="Date range picker" @keydown.esc="open = false">
-            <div class="cui-date-range-header">
-                <span class="cui-date-range-year">{{ leftYear }}</span>
-                <button type="button"
-                        class="cui-date-range-icon-btn"
-                        aria-label="Select year"
-                        @click="yearMode = !yearMode">
-                    <span class="symbols">edit</span>
-                </button>
-                <button type="button"
-                        class="cui-date-range-icon-btn cui-date-range-clear-btn"
-                        aria-label="Clear dates"
-                        title="Clear dates"
-                        @click="clearDates">
-                    <span class="symbols">event_busy</span>
-                </button>
-                <button type="button" ref="closeBtn"
-                        class="cui-date-range-icon-btn cui-date-range-close-btn"
-                        aria-label="Close"
-                        title="Close"
-                        @click="this.open = false">
-                    <span class="symbols">close</span>
+    <div class="cui-date-range-component" ref="root">
+        <div class="cui-date-range">
+            <div class="cui-date-range-buttons" :style="{'anchor-name':'--'+Id}">
+                <cui-textbox :key="'s' + startKey"
+                             :id="Id+'-fromDate'"
+                             :type="inputType()"
+                             :label="startDateLabel"
+                             class="cui-date-range-input start-input"
+                             :name="StartName"
+                             :model-value="inputValue(start)"
+                             :model-modifiers="{ lazy: true }"
+                             :mask="mask"
+                             :placeholder="placeholder"
+                             :disabled="disabled"
+                             :readonly="readonly"
+                             :required="required"
+                             :aria-invalid="IsInvalid"
+                             :aria-label="`${startDateLabel} date`"
+                             :validateOn="valTrigger"
+                             @update:model-value="onInputChange('start', $event)"
+                             @error="onErrorMsg"
+                             v-show="inputType()!='hidden'">
+                    <template #errors>{{noop}}</template>
+                </cui-textbox>
+                <cui-textbox :key="'e' + endKey"
+                             :id="Id+'-toDate'"
+                             :type="inputType()"
+                             :label="endDateLabel"
+                             class="cui-date-range-input end-input"
+                             :name="EndName"
+                             :model-value="inputValue(end)"
+                             :model-modifiers="{ lazy: true }"
+                             :mask="mask"
+                             :placeholder="placeholder"
+                             :disabled="disabled"
+                             :required="required"
+                             :readonly="readonly"
+                             :aria-invalid="IsInvalid"
+                             :aria-label="`${endDateLabel} date`"
+                             :validateOn="valTrigger"
+                             @update:model-value="onInputChange('end', $event)"
+                             @error="onErrorMsg"
+                             :actionBtnConfig="PickerBtnConfig"
+                             v-show="inputType()!='hidden'">
+                    <template #errors>{{noop}}</template>
+                </cui-textbox>
+                <button v-if="inputType()==='hidden'"
+                        class="cui-date-range-btn"
+                        :title="'From: ' + this.start + ' To: ' + this.end"
+                        aria-label="Open Date Range Picker"
+                        :aria-expanded="open"
+                        :disabled="disabled||readonly"
+                        @click="togglePicker">
+                    <span class="symbols">calendar_month</span><span class="symbols right-icon">calendar_month</span>
                 </button>
             </div>
-
-            <div class="cui-date-range-body">
-                <div v-if="yearMode" class="cui-date-range-years">
-                    <button v-for="y in years"
-                            :key="y"
-                            type="button"
-                            class="cui-date-range-year-btn"
-                            :class="{ active: y === leftYear }"
-                            @click="selectYear(y)">
-                        {{ y }}
+            <div v-show="open" class="cui-date-range-popup" role="dialog" aria-label="Date range picker" @keydown.esc="open = false" :style="{'position-anchor':'--'+Id, 'container-name':Id}">
+                <div class="cui-date-range-header">
+                    <span class="cui-date-range-year">{{ leftYear }}</span>
+                    <button type="button"
+                            class="cui-date-range-icon-btn"
+                            aria-label="Select year"
+                            @click="yearMode = !yearMode">
+                        <span class="symbols">edit</span>
+                    </button>
+                    <button type="button"
+                            class="cui-date-range-icon-btn cui-date-range-clear-btn"
+                            aria-label="Clear dates"
+                            title="Clear dates"
+                            @click="clearDates">
+                        <span class="symbols">event_busy</span>
+                    </button>
+                    <button type="button" ref="closeBtn"
+                            class="cui-date-range-icon-btn cui-date-range-close-btn"
+                            aria-label="Close"
+                            title="Close"
+                            @click="this.open = false">
+                        <span class="symbols">close</span>
                     </button>
                 </div>
 
-                <div v-else class="cui-date-range-calendars">
-                    <div v-for="cal in calendars" :key="cal.side" class="cui-date-range-calendar">
-                        <div class="cui-date-range-month-row">
-                            <span class="cui-date-range-month-name">{{ cal.name }}</span>
-                            <button type="button" class="cui-date-range-icon-btn" aria-label="Previous month" @click="cal.prev()">
-                                <span class="symbols">chevron_left</span>
-                            </button>
-                            <button type="button" class="cui-date-range-icon-btn" aria-label="Next month" @click="cal.next()">
-                                <span class="symbols">chevron_right</span>
-                            </button>
-                        </div>
-                        <div class="cui-date-range-grid">
-                            <span v-for="(d, i) in weekdays" :key="'w' + i" class="cui-date-range-weekday">{{ d }}</span>
-                            <template v-for="(cell, i) in cal.cells" :key="i">
-                                <span v-if="!cell" class="cui-date-range-blank"></span>
-                                <button v-else
-                                        type="button"
-                                        class="cui-date-range-day"
-                                        :class="dayClasses(cell.key)"
-                                        @click="selectDate(cell.key)"
-                                        :aria-label="DOW(i)+cal.name+' '+ordinalDay(cell.day)">
-                                    {{ cell.day }}
+                <div class="cui-date-range-body">
+                    <div v-if="yearMode" class="cui-date-range-years">
+                        <button v-for="y in years"
+                                :key="y"
+                                type="button"
+                                class="cui-date-range-year-btn"
+                                :class="{ active: y === leftYear }"
+                                @click="selectYear(y)">
+                            {{ y }}
+                        </button>
+                    </div>
+
+                    <div v-else class="cui-date-range-calendars">
+                        <div v-for="cal in calendars" :key="cal.side" class="cui-date-range-calendar">
+                            <div class="cui-date-range-month-row">
+                                <span class="cui-date-range-month-name">{{ cal.name }}</span><span class="cui-date-range-month-year" v-if="leftYear!=cal.year">{{cal.year}}</span>
+                                <button type="button" class="cui-date-range-icon-btn" aria-label="Previous month" @click="cal.prev()">
+                                    <span class="symbols">chevron_left</span>
                                 </button>
-                            </template>
+                                <button type="button" class="cui-date-range-icon-btn" aria-label="Next month" @click="cal.next()">
+                                    <span class="symbols">chevron_right</span>
+                                </button>
+                            </div>
+                            <div class="cui-date-range-grid">
+                                <span v-for="(d, i) in weekdays" :key="'w' + i" class="cui-date-range-weekday">{{ d }}</span>
+                                <template v-for="(cell, i) in cal.cells" :key="i">
+                                    <span v-if="!cell" class="cui-date-range-blank"></span>
+                                    <button v-else
+                                            type="button"
+                                            class="cui-date-range-day"
+                                            :class="dayClasses(cell.key)"
+                                            @click="selectDate(cell.key)"
+                                            :aria-label="DOW(i)+cal.name+' '+ordinalDay(cell.day)">
+                                        {{ cell.day }}
+                                    </button>
+                                </template>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="errors" role="status" :id="this.Id+'_valmsg'">
+            <slot name="errors" :id="Id"
+                  :value="lastEmittedValue"
+                  :required="required"
+                  :disabled="disabled"
+                  :readonly="readonly"
+                  :validityInfo="validityInfo"
+                  :validateTrigger="valTrigger">
+                {{error_msg}}
+            </slot>
+        </div>
+        <slot v-if="$slots.default"
+              :id="Id"
+              :value="lastEmittedValue"
+              :required="required"
+              :disabled="disabled"
+              :readonly="readonly"
+              :validityInfo="validityInfo"
+              :validateTrigger="valTrigger">
+        </slot>
     </div>
 </template>
 <script>
     import { nextTock } from "../js/common.js"
+    import { ValError } from "../js/ValError.js"
+    import InputComponentBase from '../js/InputComponentBase.js';
     import { ActionBtnConfig } from "../js/ActionBtnConfig.js"
     import CuiTextbox from './cui-TextBox.vue';
     let cnt = 1;
@@ -212,14 +256,18 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
     }
 
     export default {
+        extends: InputComponentBase,
         components: { CuiTextbox },
         props: {
             id: null,
             // ISO 'yyyy-MM-dd' string (a Date is also accepted). Emitted values are ISO strings or null.
             startDate: { type: [String, Date], default: null },
             endDate: { type: [String, Date], default: null },
-            startYear: { type: Number, default: () => new Date().getFullYear() - 31 },
-            endYear: { type: Number, default: () => new Date().getFullYear() },
+            min: { type: [String, Date], default: null },
+            max: { type: [String, Date], default: null },
+            required: { type: Boolean, default: false },
+            disabled: { type: Boolean, default: false },
+            readonly: { type: Boolean, default: false },
             // Optional form field names for the start/end inputs.
             startName: { type: String, default: undefined },
             endName: { type: String, default: undefined },
@@ -228,6 +276,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             // Overrides the browser locale date format, e.g. 'dd/MM/yyyy', 'M/d/yyyy' or 'yyyy-MM-dd'.
             // Tokens: yyyy, yy, MM, M, dd, d. M and d accept one or two digits. Any other character is a literal separator.
             dateMask: { type: String, default: null },
+            validateOn: null,
         },
         emits: ['update:start-date', 'update:end-date', 'change'],
         data() {
@@ -239,9 +288,12 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 rightIdx: 1,
                 startKey: 0,
                 endKey: 0,
+                valTrigger: 0,
+                lastEmittedValue: null,
             };
         },
         computed: {
+            noop() { return null; },
             start() { return normalize(this.startDate); },
             end() { return normalize(this.endDate); },
             weekdays() { return ['S', 'M', 'T', 'W', 'T', 'F', 'S']; },
@@ -258,8 +310,12 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             mask() { return this.inputType() === 'hidden' ? null : this.dateFormat.mask; },
             leftYear() { return Math.floor(this.leftIdx / 12); },
             years() {
-                const hi = Math.max(this.startYear, this.endYear);
-                const lo = Math.min(this.startYear, this.endYear);
+                const min = this.min ? new Date(this.min) : null;
+                const max = this.max ? new Date(this.max) : null;
+                const startYear = min?.getFullYear() || new Date().getFullYear() - 31;
+                const endYear = max?.getFullYear() || new Date().getFullYear() + 8;
+                const hi = Math.max(startYear, endYear);
+                const lo = Math.min(startYear, endYear);
                 const list = [];
                 for (let y = hi; y >= lo; y--) list.push(y);
                 return list;
@@ -298,12 +354,21 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             open(newVal) {
                 //if (newVal && this.$refs.closeBtn) this.$refs.closeBtn.focus()
                 if (newVal) this.$nextTick(() => this.$refs.closeBtn.focus());
+            },
+            validateOn(newVal) {
+                if (newVal) this.checkValidity(this.start, this.end);
+            },
+            startDate(newVal) {
+                this.$nextTick(() => this.checkValidity(this.start, this.end));
+            },
+            endDate(newVal) {
+                this.$nextTick(() => this.checkValidity(this.start, this.end));
             }
         },
         created() {
             this.Id = this.id ? this.id : 'dateRange' + cnt++;
-            this.StartName = this.startName ? this.startName : this.Id + '.StartDate'; 
-            this.EndName = this.endName ? this.endName : this.Id + '.EndDate'; 
+            this.StartName = this.startName ? this.startName : this.Id + '.FromDate';
+            this.EndName = this.endName ? this.endName : this.Id + '.ToDate';
         },
         mounted() {
             document.addEventListener('mousedown', this.onDocumentMouseDown);
@@ -312,9 +377,6 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             document.removeEventListener('mousedown', this.onDocumentMouseDown);
         },
         methods: {
-            onInput(e) {
-                console.log(e);
-            },
             ordinalDay(day) {
                 return ordinalNames[day - 1];
             },
@@ -332,6 +394,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     this.open = false;
                     return;
                 }
+                if (this.readonly || this.disabled) return;
                 if (!this.open) this.resetMonths();
                 this.yearMode = false;
                 this.open = true;
@@ -363,7 +426,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 const cells = [];
                 for (let i = 0; i < firstDow; i++) cells.push(null);
                 for (let d = 1; d <= daysInMonth; d++) cells.push({ day: d, key: toKey(year, month, d) });
-                return { name, cells };
+                return { name, cells, year };
             },
             inputType() {
                 const c = this.$attrs.class;
@@ -378,7 +441,23 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 if (which === 'start') this.startKey++;
                 else this.endKey++;
             },
+            emitValues(start, end) {
+                this.checkValidity(start, end);
+                if (start !== this.start) this.$emit('update:start-date', start);
+                if (end !== this.end) this.$emit('update:end-date', end);
+                this.emitRange(start, end)
+            },
+            emitRange(from, to) {
+                if (this.readonly || this.disabled) return;
+                if (from && to) {
+                    this.checkValidity(from,to);
+                    this.$emit('change', { fromDate: from, toDate: to });
+                    this.lastEmittedValue = { fromDate: from, toDate: to }
+                    this.$nextTick(() => this.valTrigger++);
+                }
+            },
             onInputChange(which, text) {
+                if (this.readonly || this.disabled) return;
                 text = (text ?? '').toString().trim();
                 let value = null;
                 if (text) {
@@ -390,50 +469,45 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     }
                     if (this.dateFormat.format(value) !== text && this.inputType() !== 'hidden') this.resetInput(which);
                 }
-                let newStart = which === 'start' ? value : this.start;
-                let newEnd = which === 'end' ? value : this.end;
-                if (newStart && newEnd && newStart > newEnd) {
-                    [newStart, newEnd] = [newEnd, newStart];
+                let newFrom = which === 'start' ? value : this.start;
+                let newTo = which === 'end' ? value : this.end;
+                if (newFrom && newTo && newFrom > newTo) {
+                    [newFrom, newTo] = [newTo, newFrom];
                 }
-                if (newStart !== this.start) this.$emit('update:start-date', newStart);
-                if (newEnd !== this.end) this.$emit('update:end-date', newEnd);
-                if (newStart && newEnd) {
-                    this.$emit('change', { startDate: newStart, endDate: newEnd });
-                }
+                this.emitValues(newFrom, newTo);
             },
             clearDates() {
-                if (this.start) this.$emit('update:start-date', null);
-                if (this.end) this.$emit('update:end-date', null);
+                if (this.readonly || this.disabled) return;
+                this.emitValues(newFrom, newTo);
             },
             selectDate(key) {
+                if (this.readonly || this.disabled) return;
                 const s = this.start;
                 const e = this.end;
-                let newStart;
-                let newEnd;
+                let newFrom;
+                let newTo;
                 if (s && e) {
                     if (key < s) {
-                        newStart = key;
-                        newEnd = e;
+                        newFrom = key;
+                        newTo = e;
                     } else if (key > e) {
-                        newStart = s;
-                        newEnd = key;
+                        newFrom = s;
+                        newTo = key;
                     } else {
-                        newStart = key;
-                        newEnd = key;
+                        newFrom = key;
+                        newTo = key;
                     }
                 } else if (!s) {
-                    newStart = key;
-                    newEnd = key;
+                    newFrom = key;
+                    newTo = key;
                 } else if (key < s) {
-                    newStart = key;
-                    newEnd = s;
+                    newFrom = key;
+                    newTo = s;
                 } else {
-                    newStart = s;
-                    newEnd = key;
+                    newFrom = s;
+                    newTo = key;
                 }
-                if (newStart !== s) this.$emit('update:start-date', newStart);
-                if (newEnd !== e) this.$emit('update:end-date', newEnd);
-                this.$emit('change', { startDate: newStart, endDate: newEnd });
+                this.emitValues(newFrom, newTo);
             },
             dayClasses(key) {
                 const s = this.start;
@@ -447,11 +521,39 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 }
                 return { single: key === (s || e) };
             },
+            checkValidity(from, to) {
+                if (this.readonly || this.disabled) return true;
+                const s = from;
+                const e = to;
+                let valid = true;
+                this.errList.removeId(this.Id);
+                this.errList.removeId('native');
+                this.$refs.startInput
+                if (this.required && (!s || !e)) {
+                    this.errList.addError(new ValError(`'${this.startDateLabel}' and '${this.endDateLabel}' dates are required.`, 98.05, this.Id, this.Id));
+                    valid = false;
+                }
+                if (s && e && s > e) {
+                    this.errList.addError(new ValError(`'${this.startDateLabel}' date must be before or equal to '${this.endDateLabel}' date.`, 98.04, this.Id, this.Id));
+                    valid = false;
+                }
+                if (s && this.min && s < normalize(this.min)) {
+                    this.errList.addError(new ValError(`'${this.startDateLabel}' date must be on or after ${this.dateFormat.format(normalize(this.min))}.`, 98.03, this.Id, this.Id));
+                    valid = false;
+                }
+                if (e && this.max && e > normalize(this.max)) {
+                    this.errList.addError(new ValError(`'${this.endDateLabel}' date must be on or before ${this.dateFormat.format(normalize(this.max))}.`, 98.03, this.Id, this.Id));
+                    valid = false;
+                }
+                this.valTrigger++;
+                this.error_msg = this.errList.getTopMsg();
+                return valid;
+            }
         },
     };
 </script>
 <style>
-    .cui-date-range {
+    .cui-date-range-component {
         position: relative;
         display: inline-block;
     }
@@ -461,6 +563,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
         flex-direction: row;
         gap: 0.25rem;
     }
+
+        .cui-date-range-buttons .right-icon {
+            margin-left: 1rem;
+        }
 
     .cui-date-range-btn,
     .cui-date-range-icon-btn {
@@ -474,9 +580,9 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
         cursor: pointer;
     }
 
-    .cui-date-range-btn.active {
-        border-color: var(--color-primary);
-    }
+        .cui-date-range-btn.active {
+            border-color: var(--color-primary);
+        }
 
     .cui-date-range-input {
         width: 7.5rem;
@@ -496,8 +602,8 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
     }
 
     .cui-date-range-popup {
-        --cui-date-range-body-width: 36rem;
-        --cui-date-range-body-height: 17rem;
+        --cui-date-range-calendar-width: 14rem;
+        --cui-date-range-body-height: auto;
         position: absolute;
         top: 100%;
         left: 0;
@@ -520,7 +626,6 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
 
     .cui-date-range-body {
         box-sizing: border-box;
-        width: var(--cui-date-range-body-width);
         height: var(--cui-date-range-body-height);
         padding: 0.5rem;
         overflow: hidden;
@@ -547,10 +652,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
         cursor: pointer;
     }
 
-    .cui-date-range-year-btn.active {
-        background: var(--color-primary);
-        color: #ffffff;
-    }
+        .cui-date-range-year-btn.active {
+            background: var(--color-primary);
+            color: #ffffff;
+        }
 
     .cui-date-range-calendars {
         display: flex;
@@ -560,7 +665,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
 
     .cui-date-range-calendar {
         flex: 1 1 0;
-        min-width: 0;
+        min-width: var(--cui-date-range-calendar-width);
     }
 
     .cui-date-range-month-row {
@@ -571,6 +676,11 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
 
     .cui-date-range-month-name {
         flex: 1 1 auto;
+        font-weight: bold;
+    }
+
+    .cui-date-range-month-year {
+        margin-left: 1rem;
         font-weight: bold;
     }
 
@@ -595,35 +705,43 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
         cursor: pointer;
     }
 
-    .cui-date-range-day:hover {
-        background: var(--color-background);
-    }
+        .cui-date-range-day:hover {
+            background: var(--color-background);
+        }
 
-    .cui-date-range-day.single {
-        border-color: var(--color-primary);
-        background: color-mix(in srgb, var(--color-primary) 20%, transparent);
-    }
+        .cui-date-range-day.single {
+            border-color: var(--color-primary);
+            background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+        }
 
-    .cui-date-range-day.range-start {
-        border-color: var(--color-primary);
-        border-right-color: transparent;
-        background: color-mix(in srgb, var(--color-primary) 20%, transparent);
-    }
+        .cui-date-range-day.range-start {
+            border-color: var(--color-primary);
+            border-right-color: transparent;
+            background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+        }
 
-    .cui-date-range-day.range-end {
-        border-color: var(--color-primary);
-        border-left-color: transparent;
-        background: color-mix(in srgb, var(--color-primary) 20%, transparent);
-    }
+        .cui-date-range-day.range-end {
+            border-color: var(--color-primary);
+            border-left-color: transparent;
+            background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+        }
 
-    .cui-date-range-day.range-mid {
-        border-top-color: var(--color-primary);
-        border-bottom-color: var(--color-primary);
-        background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-    }
+        .cui-date-range-day.range-mid {
+            border-top-color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+        }
+        /* Start and end on the same day: full border */
+        .cui-date-range-day.range-start.range-end {
+            border-color: var(--color-primary);
+        }
 
-    /* Start and end on the same day: full border */
-    .cui-date-range-day.range-start.range-end {
-        border-color: var(--color-primary);
+    @supports(position-anchor: --anchor) {
+        .cui-date-range .cui-date-range-popup {
+            position: fixed;
+            top: anchor(bottom);
+            left: anchor(left);
+            position-try-fallbacks: flip-block;
+        }
     }
 </style>

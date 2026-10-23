@@ -79,6 +79,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             value: { default: true },
             uncheckedValue: null,
             modelModifiers: { type: Object, default: () => ({}) },
+            validateOn: null,
         },
         data() {
             return {
@@ -115,6 +116,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 },
                 immediate: true
             },
+            validateOn(newVal) {
+                if (this.readonly || this.disabled) return;
+                if (newVal) this.valTrigger++;
+            }
         },
         methods: {
             onToggle(e) {

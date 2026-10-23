@@ -6,8 +6,8 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
     <div ref="component" class="cui cui-dropdown" v-bind:class="{disabled:disabled, readonly:readonly}">
         <label :for="Id" v-if="this.label">{{ label }}</label>
         <div ref="container" class="dropdown-container">
-            <select :id="Id" :name="Name" v-model="selectedValue" class="dropdown"
-                    :placeholder="placeholder" autocomplete="false"
+            <select :id="Id" :name="Name" v-model="selectedValue" class="dropdown" ref="input"
+                    :placeholder="placeholder" autocomplete="false" :required="required"
                     :aria-invalid="IsInvalid"
                     v-on:blur="onBlur"
                     v-on:focus="onFocus">
@@ -72,7 +72,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             required: { type: Boolean, default: false },
             disabled: { type: Boolean, default: false },
             readonly: { type: Boolean, default: false },
-
+            validateOn: null,
         },
         emits: ['update:model-value', 'blur', 'click', 'focus', 'input', 'change'],
         data() {
@@ -122,6 +122,20 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     this.$nextTick(() => this.currItem = this.itemFromValue(this.selectedValue));
                 },
                 immediate: true
+            },
+            validateOn(newVal) {
+                if (this.readonly || this.disabled) return;
+                if (newVal) {
+                    this.$refs.input.checkValidity();
+                    this.evalValidity({
+                        type: 'checkValidity',
+                        target: this.$refs.input,
+                        currentTarget: this.$refs.input,
+                        stopPropagation: () => { return; },
+                        preventDefault: () => { return; },
+                    });
+                    this.valTrigger++;
+                }
             }
         },
         methods: {

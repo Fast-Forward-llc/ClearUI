@@ -88,6 +88,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             disabled: { type: Boolean, default: false },
             readonly: { type: Boolean, default: false },
             multiselect: { type: Boolean, default: false },
+            validateOn: null,
         },
         emits: ['update:model-value', 'blur', 'click', 'focus', 'input', 'change', 'error', 'clear-error'],
         data() {
@@ -144,6 +145,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 },
                 immediate: true
             },
+            validateOn(newVal) {
+                if (this.readonly || this.disabled) return;
+                if (newVal) this.valTrigger++;
+            }
         },
         methods: {
             listItemId(item,idx) {

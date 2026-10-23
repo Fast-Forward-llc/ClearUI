@@ -25,6 +25,7 @@ A custom, accessible checkbox component using a div and Material Symbols for the
 | value          | Boolean/Number/String    | true      | Value when checked.                                                |
 | uncheckedValue | Boolean/Number/String    | false     | Value when unchecked.                                              |
 | disabled       | Boolean                  | false     | Disables the checkbox.                                             |
+| validateOn | Any | null | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 | readonly       | Boolean                  | false     | Makes the checkbox read-only.                                      |
 | required       | Boolean                  | false     | Marks the checkbox as required.                                    |
 | modelModifiers | Object                   | {}        | Vue v-model modifiers (e.g., lazy).                                |
@@ -59,11 +60,8 @@ A custom, accessible checkbox component using a div and Material Symbols for the
 - Accessible with ARIA roles and keyboard support.
 
 ## Validation
-Native input validation is supported. Native validation errors use the native message text and have a priority of 98.
-to override the native error message ensure the error event is dispatched with a higher priority than 98 (e.g. 99). The error event payload should include `ctrlId`, `msgId`, `msg`, and `priority`.
 
-The component listens for all error events dispatched by any child components (bubbled events) and will display the error message with the highest priority.
-
+`cui-checkbox` does not have any native validations, any validations including `required` must be implemented with cui-valmsg in the default slot or custom error display in the errors slot. The `required` prop is only used to apply the `aria-required` attribute to the checkbox group and is passed to the `errors` and `default` slot to support custom validation.
 
 ## Example: Lazy Modifier
 

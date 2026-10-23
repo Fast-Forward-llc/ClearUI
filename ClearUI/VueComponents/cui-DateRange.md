@@ -21,7 +21,8 @@ The inputs show and accept dates in the browser's locale format. The component's
 | endName        | String         | `{id}.EndDate`     | `name` of the end input, used when posting a form.                                           |
 | startDateLabel | String         | `From`             | Label displayed for the start input.                                                         |
 | endDateLabel   | String         | `To`               | Label displayed for the end input.                                                           |
-| dateMask       | String         | `null`             | Overrides the browser locale date format, e.g. `dd/MM/yyyy`. See [Text Inputs](#text-inputs). |
+See [Text Inputs](#text-inputs). |
+| validateOn     | Any            | `null`             | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 
 ---
 

@@ -36,6 +36,7 @@ A flexible, accessible tree list component for displaying and selecting hierarch
 | invalid          | Boolean   | false     | Marks the control as invalid.                                      |
 | required         | Boolean   | false     | Marks the control as required.                                     |
 | disabled         | Boolean   | false     | Disables the control.                                              |
+| validateOn | Any | null | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 | readonly         | Boolean   | false     | Makes the control read-only.                                       |
 | selectable       | Boolean   | false     | Enables selection of nodes.                                        |
 | cascadeSelect    | Boolean   | true      | Enables cascading selection to children/parents.                   |

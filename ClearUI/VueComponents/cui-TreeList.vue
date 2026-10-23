@@ -78,6 +78,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             "modelModifiers": null,
             collapsible: { default: true, type: Boolean },
             selectItemFn: { default: null, type: Function },
+            validateOn: null,
         },
         data() {
             return {
@@ -489,6 +490,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             listItems(newVal, oldVal) {
                 this.reconcileValues(newVal);
             },
+            validateOn(newVal) {
+                if (this.readonly || this.disabled) return;
+                if (newVal) this.valTrigger++;
+            }
         },
         created() {
             this.Id = (this.id == null) ? 'treelist' + treeCount++ : this.id;

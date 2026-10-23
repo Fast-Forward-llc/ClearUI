@@ -7,7 +7,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
         <div ref="container" class="dropdown-container">
             <label :for="Id" v-if="this.label">{{ label }}</label>
             <div ref="dropdown" class="dropdown" @click="toggleDropdown" role="combobox" tabindex="0" v-on:focusout="onFocusOut" v-on:focus="onFocus" v-on:keydown="onKeydown" :style="{'anchor-name':'--'+Id}">
-                <input ref="input" type="text" :id="Id" :value="selectedText" tabindex="-1" :placeholder="placeholder" autocomplete="false"
+                <input ref="input" type="text" :id="Id" :value="selectedText" tabindex="-1" :placeholder="placeholder" autocomplete="false" :required="required"
                        :aria-invalid="isInvalid" v-on:focus="onFocus_Input" v-on:mousedown="noop" v-on:click="noop" />
                 <input ref="hiddenInput" type="hidden" :name="Name" :value="serializedValue" />
                 <span class="symbols expander"></span>
@@ -83,6 +83,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             disabled: { type: Boolean, default: false },
             readonly: { type: Boolean, default: false },
             multiselect: { type: Boolean, default: false },
+            validateOn: null,
 
         },
         emits: ['update:model-value', 'blur', 'click', 'focus', 'input', 'change'],
@@ -148,6 +149,10 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     this.$nextTick(() => this.currItem = this.multiselect ? null : this.itemFromValue(this.selectedValue));
                 },
                 immediate: true
+            },
+            validateOn(newVal) {
+                if (this.readonly || this.disabled) return;
+                if (newVal) this.checkValidity();
             }
         },
         methods: {
@@ -197,7 +202,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 if (this.firstItem) {
                     if (this.listItemValue(this.firstItem) == val) return this.firstItem;
                 }
-                if (this.listItems==null) return null;
+                if (this.listItems == null) return null;
                 let item = this.listItems.find(i => this.listItemValue(i) == val);
                 return item;
             },
@@ -376,16 +381,17 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 const flippedToTop = rectPopup.bottom <= rectAnchor.top;
                 const flippedToBottom = rectPopup.top >= rectAnchor.bottom;
                 console.log(`popup.bottom:${rectPopup.bottom} anchor.top:${rectAnchor.top}`);
-                if(flippedToTop) {
+                if (flippedToTop) {
                     console.log("Popup is now above the anchor (block-start)");
                     popup.classList.add("anchored-top");
-                } else if(flippedToBottom) {
+                } else if (flippedToBottom) {
                     console.log("Popup is now below the anchor (block-end)");
                     popup.classList.remove("anchored-top");
                 }
             },
             detectFlip() {
-                
+                if (!this.$refs.dropdown || !this.$refs.list) return;
+
                 const anchorRect = this.$refs.dropdown.getBoundingClientRect();
                 const popupRect = this.$refs.list.getBoundingClientRect();
 
@@ -396,7 +402,21 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     this.anchoredTop = anchoredTop;
                 }
                 requestAnimationFrame(this.detectFlip);
-            }
+            },
+            checkValidity(e, forceEmit) {
+                if (!e) {
+                    e = {
+                        type: 'checkValidity',
+                        target: this.$refs.input,
+                        currentTarget: this.$refs.input,
+                        stopPropagation: () => { return; },
+                        preventDefault: () => { return; },
+                    }
+                }
+                e.target.checkValidity();
+                this.evalValidity(e, forceEmit);
+                this.$nextTick(() => this.valTrigger++);
+            },
         },
         created() {
             this.Id = !this.id ? 'dropdown' + cnt++ : this.id;
@@ -408,7 +428,11 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             const anchor = this.$refs.dropdown;
 
             let lastTop = null;
-            requestAnimationFrame(this.detectFlip);
+            this.flipFrameId = requestAnimationFrame(this.detectFlip);
+        },
+        beforeUnmount() {
+            if (this.flipFrameId != null) cancelAnimationFrame(this.flipFrameId);
+            this.flipFrameId = null;
         }
     };
     let cnt = 0;

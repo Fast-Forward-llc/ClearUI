@@ -28,6 +28,8 @@ An accessible, keyboard-navigable listbox component for Vue 3 applications. Buil
 | itemElementType | String | `'li'` | No | Element type used for keyboard navigation matching |
 | required | Boolean | `false` | No | Marks the field as required for validation |
 | disabled | Boolean | `false` | No | Disables the listbox and prevents selection |
+| validateOn | Any | 
+ull | No | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 | readonly | Boolean | `false` | No | Prevents selection changes without disabling focus |
 | multiselect | Boolean | `false` | No | Enables selecting multiple options. See [Multiselect](#multiselect) below. |
 | errorMsg | String | — | No | Validation error message displayed below the listbox |

@@ -31,6 +31,7 @@ A custom, accessible radio button component using a div and Material Symbols for
 | uncheckedValue | Boolean/Number/String    | false     | Value when unchecked (rarely used for radios).                     |
 | errorMsg       | String                   | —         | Error message to display.                                                   |
 | disabled       | Boolean                  | false     | Disables the radio button.                                         |
+| validateOn | Any | null | Validation trigger. Assigning a new truthy value (different from the previous value) externally triggers validation, e.g. `:validate-on="counter"` and increment `counter`. |
 | readonly       | Boolean                  | false     | Makes the radio button read-only.                                  |
 | required       | Boolean                  | false     | Marks the radio button as required.                                |
 | modelModifiers | Object                   | {}        | Vue v-model modifiers (e.g., lazy).                                |

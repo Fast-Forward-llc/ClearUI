@@ -135,4 +135,100 @@ describe('cui-dropdown', () => {
         });
         expect(wrapper.find('[role=listbox]').attributes('aria-multiselectable')).toBe('true');
     });
+
+    describe('required', () => {
+        const mountRequired = async (props = {}) => {
+            const wrapper = mount(CuiDropdown, {
+                props: { listItems: items, valueField: 'id', textField: 'name', required: true, ...props },
+                attachTo: document.body,
+            });
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$nextTick();
+            return wrapper;
+        };
+
+        it('sets the required attribute on the visible input only', async () => {
+            const wrapper = await mountRequired();
+            expect(wrapper.find('input[type=text]').element.required).toBe(true);
+            expect(wrapper.find('input[type=hidden]').element.required).toBe(false);
+            wrapper.unmount();
+        });
+
+        it('does not set required by default', async () => {
+            const wrapper = await mountRequired({ required: false });
+            expect(wrapper.find('input[type=text]').element.required).toBe(false);
+            wrapper.unmount();
+        });
+
+        it('is invalid when no value is selected', async () => {
+            const wrapper = await mountRequired({ modelValue: null });
+            wrapper.vm.checkValidity();
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.inputIsValid).toBe(false);
+            expect(wrapper.vm.IsInvalid).toBe(true);
+            expect(wrapper.vm.validityInfo.valueMissing).toBe(true);
+            expect(wrapper.find('.errors').text()).not.toBe('');
+            wrapper.unmount();
+        });
+
+        it('is valid when a value is selected', async () => {
+            const wrapper = await mountRequired({ modelValue: 2 });
+            wrapper.vm.checkValidity();
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.inputIsValid).toBe(true);
+            expect(wrapper.vm.IsInvalid).toBe(false);
+            expect(wrapper.find('.errors').text()).toBe('');
+            wrapper.unmount();
+        });
+
+        it('is valid when not required and nothing is selected', async () => {
+            const wrapper = await mountRequired({ required: false, modelValue: null });
+            wrapper.vm.checkValidity();
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.inputIsValid).toBe(true);
+            wrapper.unmount();
+        });
+
+        it('becomes valid after an option is selected', async () => {
+            const wrapper = await mountRequired({
+                modelValue: null,
+                'onUpdate:modelValue': (v) => wrapper.setProps({ modelValue: v }),
+            });
+            wrapper.vm.checkValidity();
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.IsInvalid).toBe(true);
+
+            await wrapper.findAll('[role=option]')[0].trigger('click');
+            await wrapper.vm.$nextTick();
+            await wrapper.vm.$nextTick();
+            wrapper.vm.checkValidity();
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.inputIsValid).toBe(true);
+            expect(wrapper.vm.IsInvalid).toBe(false);
+            wrapper.unmount();
+        });
+
+        it('multiselect: is invalid when empty and valid when at least one item is selected', async () => {
+            const empty = await mountRequired({ multiselect: true, modelValue: [] });
+            empty.vm.checkValidity();
+            await empty.vm.$nextTick();
+            expect(empty.vm.validityInfo.valueMissing).toBe(true);
+            empty.unmount();
+
+            const filled = await mountRequired({ multiselect: true, modelValue: [1, 3] });
+            filled.vm.checkValidity();
+            await filled.vm.$nextTick();
+            expect(filled.vm.inputIsValid).toBe(true);
+            filled.unmount();
+        });
+
+        it('re-validates when the validate prop changes', async () => {
+            const wrapper = await mountRequired({ modelValue: null, validateOn: 0 });
+            expect(wrapper.vm.IsInvalid).toBeFalsy();
+            await wrapper.setProps({ validateOn: 1 });
+            await wrapper.vm.$nextTick();
+            expect(wrapper.vm.IsInvalid).toBe(true);
+            wrapper.unmount();
+        });
+    });
 });

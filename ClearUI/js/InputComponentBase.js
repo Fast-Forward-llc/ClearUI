@@ -51,12 +51,14 @@ export default {
         this.errList = new ErrorList();
     },
     mounted() {
+        this.$el.addEventListener('invalid', this.evalValidity);
         this.$el.addEventListener('set-error-msg', this.onErrorMsg);
         this.$el.addEventListener('clear-error-msg', this.onClearErrorMsg);
         this.$el.addEventListener('reset-error-msg', this.onResetErrorMsg);
     },
     beforeUnmount() {
         if (this.$el) {
+            this.$el.removeEventListener('invalid', this.evalValidity);
             this.$el.removeEventListener('set-error-msg', this.onErrorMsg);
             this.$el.removeEventListener('clear-error-msg', this.onClearErrorMsg);
             this.$el.removeEventListener('reset-error-msg', this.onResetErrorMsg);

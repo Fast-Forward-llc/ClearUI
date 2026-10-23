@@ -131,7 +131,7 @@ const nativeErrorPri = 98.001;
 const nativeErrorId = '_NativeError_';
 import { ValError, ValErrorEvent } from './ValError.js';
 const ComponentValErrorFns = {
-    dispatchValErrorEvents(dispatchFn, msg) {
+    dispatchValErrorEvents(dispatchFn, msg, msgId, skipEmit=false) {
         if (this.prevErrMsg == msg) return;
         if (this.errorEventSelector) {
             let nodes = document.querySelectorAll(this.errorEventSelector);
@@ -146,12 +146,15 @@ const ComponentValErrorFns = {
                     bubbles: true,
                     cancelable: true
                 });
+            console.log('dispatch error', this.Id, msg);
             let node = document.getElementById(this.Id);
             if (node) node.dispatchEvent(valErrorEvent);
+            if (!skipEmit) this.$emit('error', { ctrlId: this.Id, msgId: msgId || this.Id, msg: msg });
         }
         this.prevErrMsg = msg;
     },
     onErrorMsg(e) {
+        console.log('error',e.type, e?.target?.id)
         if (e instanceof Event) {
             e.stopPropagation();
             e = e.valError;
@@ -161,10 +164,11 @@ const ComponentValErrorFns = {
         this.errSort = true;
         this.$nextTick(() => {
             this.errList.sort();
-            this.error_msg = this.errList.getTopMsg();
+            this.error = this.errList.getTopError();
+            this.error_msg = this.error?.msg;
             this.errSort = false;
-            this.$emit('error', { ctrlId: this.Id, msgId: null, msg: this.error_msg });
-            this.dispatchValErrorEvents(this.errList.dispatchSetErrorEvent, this.error_msg);
+            this.$emit('error', { ctrlId: this.Id, msgId: this.error?.msgId, msg: this.error_msg });
+            this.dispatchValErrorEvents(this.errList.dispatchSetErrorEvent, this.error_msg, this.error?.msgId, true);
         });
 
     },
@@ -177,7 +181,8 @@ const ComponentValErrorFns = {
         if (valError?.msg == null) return;
         this.errList.remove(valError.msg);
         this.errList.removeId(valError.msgId);
-        this.error_msg = this.errList.getTopMsg();
+        this.error = this.errList.getTopError();
+        this.error_msg = this.error?.msg;
         this.dispatchValErrorEvents(this.errList.dispatchClearErrorEvent, null);
     },
     onResetErrorMsg() {
@@ -187,6 +192,7 @@ const ComponentValErrorFns = {
     evalValidity(e, forceEmit) {
         if (!e?.target) return;
         e?.stopPropagation();
+        if (typeof e.target?.checkValidity === 'function') e.target.checkValidity();
         this.validityInfo = new ValidityInfo(); // Object.assign(new ValidityInfo(), e.target.validity);
         for (const key in e.target.validity) {
             this.validityInfo[key] = e.target.validity[key];
@@ -198,8 +204,9 @@ const ComponentValErrorFns = {
                 this.errList.addError(new ValError(this.nativeValidationMsg, nativeErrorPri, nativeErrorId, this.Id));
             else
                 this.errList.removeId(nativeErrorId);
-        this.error_msg = this.errList.getTopMsg();
-        if (this.error_msg) this.dispatchValErrorEvents(this.errList.dispatchSetErrorEvent, this.error_msg, 'native');
+        this.error = this.errList.getTopError();
+        this.error_msg = this.error?.msg;
+        if (this.error_msg) this.dispatchValErrorEvents(this.errList.dispatchSetErrorEvent, this.error.msg, 'native');
         else this.dispatchValErrorEvents(this.errList.dispatchClearErrorEvent, null, 'native');
     },
 }
