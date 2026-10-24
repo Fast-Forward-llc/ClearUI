@@ -11,7 +11,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             tabindex="0"
             :aria-activedescendant="activeDescendantId"
             :aria-labelledby="label ? `${Id}-label` : `${Id}-container`"
-            :aria-invalid="isInvalid"
+            :aria-invalid="IsInvalid"
             :aria-multiselectable="multiselect"
             v-on:focus="onFocus"
             v-on:focusout="onFocusOut"
@@ -20,7 +20,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 :required="required"
                 :disabled="disabled"
                 :readonly="readonly"
-                :isInvalid="isInvalid"
+                :isInvalid="IsInvalid"
                 :errorMsg="error_msg">
                 <li v-for="(item,idx) in listItems"
                     :key="listItemValue(item)"

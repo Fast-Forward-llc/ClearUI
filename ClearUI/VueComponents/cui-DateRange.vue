@@ -278,7 +278,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             dateMask: { type: String, default: null },
             validateOn: null,
         },
-        emits: ['update:start-date', 'update:end-date', 'change'],
+        emits: ['update:start-date', 'update:end-date', 'change', 'error'],
         data() {
             return {
                 open: false,
@@ -566,6 +566,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
 
         .cui-date-range-buttons .right-icon {
             margin-left: 1rem;
+            display:none;
         }
 
     .cui-date-range-btn,

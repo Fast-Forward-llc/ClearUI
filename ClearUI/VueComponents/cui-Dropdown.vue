@@ -8,7 +8,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             <label :for="Id" v-if="this.label">{{ label }}</label>
             <div ref="dropdown" class="dropdown" @click="toggleDropdown" role="combobox" tabindex="0" v-on:focusout="onFocusOut" v-on:focus="onFocus" v-on:keydown="onKeydown" :style="{'anchor-name':'--'+Id}">
                 <input ref="input" type="text" :id="Id" :value="selectedText" tabindex="-1" :placeholder="placeholder" autocomplete="false" :required="required"
-                       :aria-invalid="isInvalid" v-on:focus="onFocus_Input" v-on:mousedown="noop" v-on:click="noop" />
+                       :aria-invalid="IsInvalid" v-on:focus="onFocus_Input" v-on:mousedown="noop" v-on:click="noop" />
                 <input ref="hiddenInput" type="hidden" :name="Name" :value="serializedValue" />
                 <span class="symbols expander"></span>
             </div>
