@@ -700,7 +700,9 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
     .cui-date-range-day {
         height: 2rem;
         padding: 0;
-        border: 1px solid transparent;
+        border: 0px solid transparent;
+        border-top-width: 1px;
+        border-bottom-width: 1px;
         background: transparent;
         color: var(--color-text);
         cursor: pointer;
@@ -711,17 +713,20 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
         }
 
         .cui-date-range-day.single {
+            border-width:1px;
             border-color: var(--color-primary);
             background: color-mix(in srgb, var(--color-primary) 20%, transparent);
         }
 
         .cui-date-range-day.range-start {
+            border-left-width: 1px;
             border-color: var(--color-primary);
             border-right-color: transparent;
             background: color-mix(in srgb, var(--color-primary) 20%, transparent);
         }
 
         .cui-date-range-day.range-end {
+            border-right-width: 1px;
             border-color: var(--color-primary);
             border-left-color: transparent;
             background: color-mix(in srgb, var(--color-primary) 20%, transparent);
