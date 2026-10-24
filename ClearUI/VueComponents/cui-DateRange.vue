@@ -290,12 +290,12 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 endKey: 0,
                 valTrigger: 0,
                 lastEmittedValue: null,
+                start: null,
+                end: null,
             };
         },
         computed: {
             noop() { return null; },
-            start() { return normalize(this.startDate); },
-            end() { return normalize(this.endDate); },
             weekdays() { return ['S', 'M', 'T', 'W', 'T', 'F', 'S']; },
             dateFormat() {
                 if (!this.dateMask) return localeFormat;
@@ -359,9 +359,11 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 if (newVal) this.checkValidity(this.start, this.end);
             },
             startDate(newVal) {
+                this.start = normalize(newVal);
                 this.$nextTick(() => this.checkValidity(this.start, this.end));
             },
             endDate(newVal) {
+                this.end = normalize(newVal);
                 this.$nextTick(() => this.checkValidity(this.start, this.end));
             }
         },
@@ -369,6 +371,8 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             this.Id = this.id ? this.id : 'dateRange' + cnt++;
             this.StartName = this.startName ? this.startName : this.Id + '.FromDate';
             this.EndName = this.endName ? this.endName : this.Id + '.ToDate';
+            this.start = normalize(this.startDate);
+            this.end = normalize(this.endDate);
         },
         mounted() {
             document.addEventListener('mousedown', this.onDocumentMouseDown);
@@ -442,17 +446,17 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 else this.endKey++;
             },
             emitValues(start, end) {
-                this.checkValidity(start, end);
-                if (start !== this.start) this.$emit('update:start-date', start);
-                if (end !== this.end) this.$emit('update:end-date', end);
-                this.emitRange(start, end)
-            },
-            emitRange(from, to) {
                 if (this.readonly || this.disabled) return;
-                if (from && to) {
-                    this.checkValidity(from,to);
-                    this.$emit('change', { fromDate: from, toDate: to });
-                    this.lastEmittedValue = { fromDate: from, toDate: to }
+                this.checkValidity(start, end);
+                let newStart = start !== this.start;
+                let newEnd = end !== this.end;
+                this.start = start;
+                this.end = end;
+                if (newStart) this.$emit('update:start-date', start);
+                if (newEnd) this.$emit('update:end-date', end);
+                if (start && end) {
+                    this.lastEmittedValue = { fromDate: start, toDate: end };
+                    this.$emit('change', { fromDate: start, toDate: end });
                     this.$nextTick(() => this.valTrigger++);
                 }
             },
