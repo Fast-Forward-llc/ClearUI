@@ -277,8 +277,9 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             // Tokens: yyyy, yy, MM, M, dd, d. M and d accept one or two digits. Any other character is a literal separator.
             dateMask: { type: String, default: null },
             validateOn: null,
+            endTime: {type: String }
         },
-        emits: ['update:start-date', 'update:end-date', 'change', 'error'],
+        emits: ['update:start-date', 'update:end-date', 'change', 'error', 'close'],
         data() {
             return {
                 open: false,
@@ -348,12 +349,12 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                     onClick: this.togglePicker,
                     label: 'Open Date Picker',
                 })
-            }
+            },
         },
         watch: {
             open(newVal) {
-                //if (newVal && this.$refs.closeBtn) this.$refs.closeBtn.focus()
                 if (newVal) this.$nextTick(() => this.$refs.closeBtn.focus());
+                if (!newVal) this.$nextTick(this.$emit('close', {from:this.start, to:this.end}));
             },
             validateOn(newVal) {
                 if (newVal) this.checkValidity(this.start, this.end);
@@ -445,8 +446,9 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 if (which === 'start') this.startKey++;
                 else this.endKey++;
             },
-            emitValues(start, end) {
+            emitValues(start, end, force) {
                 if (this.readonly || this.disabled) return;
+                end = end ? end.substring(0, 10) + this.endTime : null;
                 this.checkValidity(start, end);
                 let newStart = start !== this.start;
                 let newEnd = end !== this.end;
@@ -454,9 +456,9 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
                 this.end = end;
                 if (newStart) this.$emit('update:start-date', start);
                 if (newEnd) this.$emit('update:end-date', end);
-                if (start && end) {
-                    this.lastEmittedValue = { fromDate: start, toDate: end };
-                    this.$emit('change', { fromDate: start, toDate: end });
+                if ((start && end)|| force) {
+                    this.lastEmittedValue = { from: start, to: end };
+                    this.$emit('change', { from: start, to: end });
                     this.$nextTick(() => this.valTrigger++);
                 }
             },
@@ -482,7 +484,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             },
             clearDates() {
                 if (this.readonly || this.disabled) return;
-                this.emitValues(newFrom, newTo);
+                this.emitValues(null, null, true);
             },
             selectDate(key) {
                 if (this.readonly || this.disabled) return;
