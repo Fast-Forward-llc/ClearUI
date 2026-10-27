@@ -195,7 +195,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
     // Formats a normalized yyyy-MM-dd key using the browser locale.
     function formatLocale(key) {
         if (!key) return '';
-        const [y, m, d] = key.split('-').map(Number);
+        const [y, m, d] = key.substring(0,10).split('-').map(Number);
         return localeFormatter.format(new Date(y, m - 1, d));
     }
 
@@ -448,7 +448,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             },
             emitValues(start, end, force) {
                 if (this.readonly || this.disabled) return;
-                end = end ? end.substring(0, 10) + this.endTime : null;
+                end = end ? end.substring(0, 10) + (this.endTime || '') : null;
                 this.checkValidity(start, end);
                 let newStart = start !== this.start;
                 let newEnd = end !== this.end;
@@ -517,7 +517,7 @@ Licensed under the MIT License. See LICENSE file in the project root for full li
             },
             dayClasses(key) {
                 const s = this.start;
-                const e = this.end;
+                const e = this.end ? this.end.substring(0, 10) : null;
                 if (s && e) {
                     return {
                         'range-start': key === s,
